@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit InfoCategory{% endblock %}
+
+{% block body %}
+    <h1>Edit InfoCategory</h1>
+
+    {{ include('info_category/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_info_category_index') }}">back to list</a>
+
+    {{ include('info_category/_delete_form.html.twig') }}
+{% endblock %}

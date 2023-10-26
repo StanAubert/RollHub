@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New InfoCategory{% endblock %}
+
+{% block body %}
+    <h1>Create new InfoCategory</h1>
+
+    {{ include('info_category/_form.html.twig') }}
+
+    <a href="{{ path('app_info_category_index') }}">back to list</a>
+{% endblock %}

@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Controller;
-
 use App\Entity\Info;
 use App\Form\InfoType;
 use App\Repository\InfoRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -25,21 +24,15 @@ class InfoController extends AbstractController
     #[Route('/new', name: 'app_info_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $data = json_decode($request->getContent(), true);
         $info = new Info();
-        $form = $this->createForm(InfoType::class, $info);
-        $form->handleRequest($request);
+        $info->setTitle($data['title']);
+        $info->setContent($data['content']); 
+        $entityManager->persist($info);
+        $entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($info);
-            $entityManager->flush();
+        return $this->json($info, 201);
 
-            return $this->redirectToRoute('app_info_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('info/new.html.twig', [
-            'info' => $info,
-            'form' => $form,
-        ]);
     }
 
     #[Route('/{id}', name: 'app_info_show', methods: ['GET'])]
@@ -76,6 +69,6 @@ class InfoController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_info_index', [], Response::HTTP_SEE_OTHER);
+        return $this->json(['message' => 'Info supprimée'], 204);
     }
 }

@@ -27,7 +27,7 @@
 
 ## Présentation
 
-Roll Hub est une application visant à rapprocher et aider les personnes qui pratiquer le Roller.
+Roll Hub est une application visant à rapprocher et aider les personnes qui pratiquent le Roller.
 inline, quad, 3 , 4 ou 5 roues peut importe nous avons la même passion !
 
 Roll Hub met à votre disposition une carte interactive reunissant les meilleurs spot pour rouler et surtout 

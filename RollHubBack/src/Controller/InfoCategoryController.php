@@ -31,6 +31,7 @@ class InfoCategoryController extends AbstractController
     
         $infoCategory = new InfoCategory();
         $infoCategory->setTitle($data['title']);
+        $infoCategory->setColor($data['color']);
         $entityManager->persist($infoCategory);
         $entityManager->flush();
     

@@ -50,7 +50,7 @@ class InfoCategoryController extends AbstractController
         return $this->json($infoCategory);
     }
 
-    #[Route('/{id}/edit', name: 'app_info_category_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_info_category_edit', methods: ['PUT', 'PATCH'])]
     public function edit(Request $request, InfoCategory $infoCategory, int $id ,InfoCategoryRepository $infoCategoryRepository ,EntityManagerInterface $entityManager): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -68,8 +68,8 @@ class InfoCategoryController extends AbstractController
         return $this->json($infoCategory);
     }
 
-    #[Route('/{id}', name: 'app_info_category_delete', methods: ['POST'])]
-    public function delete(Request $request, InfoCategory $infoCategory, InfoCategoryRepository $infoCategoryRepository, int $id, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_info_category_delete', methods: ['DELETE'])]
+    public function delete(InfoCategory $infoCategory, InfoCategoryRepository $infoCategoryRepository, int $id, EntityManagerInterface $entityManager): Response
     {
         $infoCategory = $infoCategoryRepository->find($id);
 

@@ -50,7 +50,7 @@ class InfoController extends AbstractController
         return $this->json($info);
     }
 
-    #[Route('/{id}/edit', name: 'app_info_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_info_edit', methods: ['PUT', 'PATCH'])]
     public function edit(Request $request, InfoRepository $infoRepository, EntityManagerInterface $entityManager, int $id): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -68,7 +68,7 @@ class InfoController extends AbstractController
         return $this->json($info);
     }
 
-    #[Route('/{id}', name: 'app_info_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_info_delete', methods: ['DELETE'])]
     public function delete(InfoRepository $infoRepository,int $id , EntityManagerInterface $entityManager): Response
     {
         $info = $infoRepository->find($id);

@@ -5,22 +5,47 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Serializer\UserSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/user')]
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
     {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
+
     }
+
+
+    private function makeJsonResponse($user, int $statusCode): Response
+    {
+        $response = new Response();
+        $jsonContent = is_array($user) ? UserSerializer::serializeAllUsers($user) : UserSerializer::serializeOneUser($user);
+        $response->setContent(json_encode($jsonContent, JSON_THROW_ON_ERROR));
+        $response->headers->set("Content-Type", "application/json");
+        $response->setStatusCode($statusCode);
+        return $response;
+    }
+
+    private function persistUser(User $user)
+    {
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+
+    #[Route('/users', name: 'getAllUsers', methods: ['GET'])]
+    public function getAllUsers(): Response
+    {
+        $users = $this->userRepository->findAll();
+        return $this->makeJsonResponse($users, Response::HTTP_OK);
+    }
+
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

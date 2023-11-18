@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/user')]
+#[Route('/api')]
 class UserController extends AbstractController
 {
     public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
@@ -47,24 +47,30 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/users', name: 'app_user_new', methods: ['POST'])]
+    public function new(Request $request): Response
     {
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        $validKeys = ["email", "password","pseudo"];
+        foreach ($data as $key => $value) {
+            if ($key == "email") {
+                $user->setEmail($value);
+            }
+            if ($key == "password") {
+                $user->setPassword($this->hasher->hashPassword($user, $value));
+            }
+            if ($key == "pseudo") {
+                $user->setPseudo($value);
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
         }
+        $this->persistUser($user);
+        return $this->makeJsonResponse($user, Response::HTTP_OK);
 
-        return $this->render('user/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
     }
 
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
@@ -75,7 +81,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT', 'PATCH'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(UserType::class, $user);

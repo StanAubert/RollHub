@@ -35,4 +35,4 @@ laisse à ses utilisateurs la possibilité d'en ajouter de nouveaux !
 
 > bientôt disponible : Si vous souhaitez prévoir une balade ou randonnée pas de soucis , préparer votre itinéraire et verifiez le temps qu'il avec notre module météo !
 
-Besoin de pratiquer ? grace au système de playlist vous pourrez personnaliser vos entrainements 
+> bientôt disponible : Besoin de pratiquer ? grace au système de playlist vous pourrez personnaliser vos entrainements 

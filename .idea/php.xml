@@ -92,6 +92,7 @@
       <path value="$PROJECT_DIR$/RollHubBack/vendor/namshi/jose" />
       <path value="$PROJECT_DIR$/RollHubBack/vendor/lcobucci/clock" />
       <path value="$PROJECT_DIR$/RollHubBack/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/RollHubBack/vendor/nelmio/cors-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

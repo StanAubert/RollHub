@@ -44,7 +44,7 @@ class InfoController extends AbstractController
         $info = $infoRepository->find($id);
         
         if (!$info) {
-            return $this->json(['message' => 'Info not found'], 404);
+            return $this->json(['message' => 'Infos not found'], 404);
         }
 
         return $this->json($info);
@@ -80,6 +80,6 @@ class InfoController extends AbstractController
         $entityManager->remove($info);
         $entityManager->flush();
 
-        return $this->json(['message' => 'Info deleted']);
+        return $this->json(['message' => 'Infos deleted']);
     }
 }

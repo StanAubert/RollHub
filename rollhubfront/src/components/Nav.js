@@ -1,10 +1,15 @@
 import React, {useState} from 'react';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import {Moon, Sun} from "react-feather";
+import {logout} from "../api";
+import LogoutModal from "./modal/LogoutModal";
+import {tokenService} from "../services/token.service";
 
 const Nav = ({role}) => {
     const [theme, setTheme] = useState("light")
+    const [errorMessage, setErrorMessage] = useState("")
+    const [isOpenModal, setIsOpenModal] = useState(false)
 
     const onChangeMode = () =>{
         switch (theme){
@@ -18,8 +23,23 @@ const Nav = ({role}) => {
                 return;
         }
     }
+
+    const openModal = () => {
+        setIsOpenModal(true)
+        console.log(isOpenModal)
+    }
+    const logoutURL= logout()
+    const navigate = useNavigate();
+    const onLogout = () => {
+        tokenService.logout()
+        navigate("/login")
+    }
     return (
         <>
+            {
+                isOpenModal &&
+                <LogoutModal logout={onLogout} close={() => {setIsOpenModal(false)}}/>
+            }
             <header>
                 <Navbar className={theme}>
                     <ul>
@@ -28,6 +48,7 @@ const Nav = ({role}) => {
                             role === "admin" &&
                                 <li><Link to={"/admin"}>Admin</Link></li>
                         }
+                        <li onClick={onLogout}> Déconnexion</li>
                     </ul>
 
                     <ThemeButton onClick={onChangeMode}>
@@ -36,8 +57,8 @@ const Nav = ({role}) => {
                         }
                     </ThemeButton>
                 </Navbar>
-            </header>
 
+            </header>
         </>
     );
 
@@ -57,7 +78,7 @@ const Navbar = styled.nav`
     justify-content: center;
     
     li{
-      color: #F5F5F5;
+      cursor: pointer;
       font-size: 1.5rem;
       padding: 0.5rem;
     }

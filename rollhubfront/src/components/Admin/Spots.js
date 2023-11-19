@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Info = () => {
+const Spots = () => {
     return (
         <div>
-
+            <h1>Spots</h1>
         </div>
     );
 };
 
-export default Info;
+export default Spots;

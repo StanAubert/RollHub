@@ -8,6 +8,8 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import GlobalStyle from "./components/GlobalStyle";
 import BaseLayout from "./components/Base/BaseLayout";
 import AdminRouter from "./components/Admin/AdminRouter";
+import AuthGuard from "./services/AuthGuard";
+import BaseRouter from "./components/Base/BaseRouter";
 
 function App() {
 
@@ -16,12 +18,16 @@ function App() {
         <GlobalStyle/>
         <BrowserRouter>
             <Routes>
-                <Route element={<BaseLayout/>}>
-                    <Route index element={ <HomePage/>}/>
-                    <Route path={"/home"} element={ <HomePage/>}/>
-                    <Route path={"*"} element={<NotFound/>}/>
-                </Route>
-                <Route path="/admin/*" element={<AdminRouter/>}/>
+                <Route path="/*" element={
+                    <AuthGuard>
+                        <BaseRouter/>
+                    </AuthGuard>
+                }/>
+                <Route path="/admin/*" element={
+                    <AuthGuard>
+                        <AdminRouter/>
+                    </AuthGuard>
+                }/>
                 <Route path={"/login"} element={ <LoginPage/>}/>
 
             </Routes>

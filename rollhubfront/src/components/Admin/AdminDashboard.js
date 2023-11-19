@@ -1,42 +1,16 @@
 import React from 'react';
 import styled from "styled-components";
+import {Link} from "react-router-dom";
 
 const AdminDashboard = () => {
     return (
         <div>
             <h2>RollHub Admin</h2>
-            <Table>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Utilisateurs</th>
-                        <th>Infos</th>
-                        <th>Spots</th>
-                        <th>Playlists</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </Table>
+            <div>
+                <Link to="users"> Utilisateurs</Link>
+                <Link to="infos"> Infos</Link>
+                <Link to="spots"> Spots</Link>
+            </div>
         </div>
     );
 };

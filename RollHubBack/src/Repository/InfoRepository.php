@@ -22,7 +22,7 @@ class InfoRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Info[] Returns an array of Info objects
+//     * @return Infos[] Returns an array of Infos objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class InfoRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Info
+//    public function findOneBySomeField($value): ?Infos
 //    {
 //        return $this->createQueryBuilder('i')
 //            ->andWhere('i.exampleField = :val')

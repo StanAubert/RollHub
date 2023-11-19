@@ -1,7 +1,8 @@
 import React from 'react';
 import {Route, Routes} from "react-router-dom";
-import {AdminLayout, Users} from "./index";
+import {AdminLayout, Infos, Spots, Users} from "./index";
 import AdminDashboard from "./AdminDashboard";
+import NotFound from "../Base/NotFound";
 
 const AdminRouter = () => {
     return (
@@ -9,6 +10,10 @@ const AdminRouter = () => {
             <Route element={<AdminLayout/>}>
                 <Route path="/" element={<AdminDashboard/> }/>
                 <Route path="users" element={<Users/> }/>
+                <Route path="infos" element={<Infos/> }/>
+                <Route path="spots" element={<Spots/> }/>
+
+                <Route path={"*"} element={<NotFound/>}/>
             </Route>
         </Routes>
     );

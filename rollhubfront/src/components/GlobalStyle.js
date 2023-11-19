@@ -7,18 +7,31 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     color: #2F2E41FF;
   }
-  ul, li {
+  ul, li , li > a{
     list-style-type: none;
+    text-decoration: none;
+  }
+
+  .App {
+    transition: all 0.5s ease;
+    height: 100%;
   }
   
-  .darkmode{
+  .dark{
     background-color: #282c34;
     color: #F5F5F5;
+    a{
+      color: #F5F5F5;
+    }
   }
   
-  .lightmode{
-    background-color: #F5F5F5;
+  .light{
+    background-color: white;
     color: #282c34;
+    
+    a{
+      color: #282c34;
+    }
   }
 
 

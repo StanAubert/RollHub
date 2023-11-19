@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Admin = () => {
+const Info = () => {
     return (
         <div>
-            <h2>RollHub Admin</h2>
+
         </div>
     );
 };
 
-export default Admin;
+export default Info;

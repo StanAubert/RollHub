@@ -20,7 +20,7 @@ const GlobalStyles = createGlobalStyle`
   .dark{
     background-color: #282c34;
     color: #F5F5F5;
-    a{
+    a, p{
       color: #F5F5F5;
     }
   }
@@ -29,7 +29,7 @@ const GlobalStyles = createGlobalStyle`
     background-color: white;
     color: #282c34;
     
-    a{
+    a, p{
       color: #282c34;
     }
   }

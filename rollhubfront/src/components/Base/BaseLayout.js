@@ -5,7 +5,7 @@ import {Outlet} from "react-router-dom";
 const BaseLayout = () => {
     return (
         <div>
-            <Nav role="user"/>
+            <Nav role="admin"/>
             <Outlet/>
         </div>
     );

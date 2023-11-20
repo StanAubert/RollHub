@@ -4,6 +4,7 @@ import axios from "axios";
 import {login} from "../../api";
 import {tokenService} from "../../services/token.service";
 import {Link, useNavigate} from "react-router-dom";
+import {UserService} from "../../services/user.service";
 
 
 const LoginPage = () => {
@@ -14,12 +15,14 @@ const LoginPage = () => {
     const [error, setError] = useState("")
     const loginUrl= login();
     const navigate = useNavigate();
+    const currUser = UserService.getUser()
 
     const onSubmit = (e) => {
         e.preventDefault();
         tokenService.login(cred)
             .then( res => {
-                tokenService.saveToken(res.data.token)
+                tokenService.saveToken(res.data.token, res.data.data.id)
+                console.log(res)
                 navigate("/")
 
             } )

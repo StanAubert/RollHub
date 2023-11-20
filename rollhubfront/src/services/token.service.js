@@ -7,8 +7,9 @@ const login = (credentials) => {
 const register = (data) => {
     return Axios.post('/user/register', data)
 }
-const saveToken = (token) => {
+const saveToken = (token, id) => {
     localStorage.setItem('token', token)
+    localStorage.setItem('currentUID', id)
 }
 
 const logout = () => {
@@ -23,6 +24,8 @@ const isLogged = () => {
 const getToken = () => {
     return localStorage.getItem('token')
 }
+
+
 export const tokenService = {
     saveToken, logout, isLogged, getToken,login, register
 }

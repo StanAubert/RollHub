@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/info')]
+#[Route('/api/info')]
 class InfoController extends AbstractController
 {
     #[Route('/', name: 'app_info_index', methods: ['GET'])]

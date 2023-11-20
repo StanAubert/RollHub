@@ -8,6 +8,11 @@ let getUser = (id) => {
 
 }
 
+const currentUser = () => {
+    let id = localStorage.getItem('currentUID')
+    return Axios.get(`/users/${id}`)
+}
+
 export const UserService = {
-    getAllUsers, getUser
+    getAllUsers, getUser, currentUser
 }

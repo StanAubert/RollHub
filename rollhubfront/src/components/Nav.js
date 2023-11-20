@@ -1,15 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import {Moon, Sun} from "react-feather";
+import {Moon, Sun, User} from "react-feather";
 import {logout} from "../api";
 import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
+import {UserService} from "../services/user.service";
 
 const Nav = ({role}) => {
     const [theme, setTheme] = useState("light")
     const [errorMessage, setErrorMessage] = useState("")
     const [isOpenModal, setIsOpenModal] = useState(false)
+    const [currUser, setCurrUser] = useState({})
 
     const onChangeMode = () =>{
         switch (theme){
@@ -34,6 +36,14 @@ const Nav = ({role}) => {
         tokenService.logout()
         navigate("/login")
     }
+    useEffect(() => {
+        UserService.currentUser()
+            .then(res => setCurrUser(res.data))
+            .catch(err => {
+                console.log(err)
+            })
+    }, []);
+
     return (
         <>
             {
@@ -48,7 +58,8 @@ const Nav = ({role}) => {
                             role === "admin" &&
                                 <li><Link to={"/admin"}>Admin</Link></li>
                         }
-                        <li onClick={onLogout}> Déconnexion</li>
+                        <li> <p>{currUser.pseudo}</p> </li>
+                        <li><a onClick={onLogout}>Déconnexion</a></li>
                     </ul>
 
                     <ThemeButton onClick={onChangeMode}>

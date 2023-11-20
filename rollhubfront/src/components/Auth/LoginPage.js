@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import styled from "styled-components";
 import axios from "axios";
-import {login} from "../api";
-import {tokenService} from "../services/token.service";
-import {useNavigate} from "react-router-dom";
+import {login} from "../../api";
+import {tokenService} from "../../services/token.service";
+import {Link, useNavigate} from "react-router-dom";
 
 
 const LoginPage = () => {
@@ -17,7 +17,7 @@ const LoginPage = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        axios.post(loginUrl, cred)
+        tokenService.login(cred)
             .then( res => {
                 tokenService.saveToken(res.data.token)
                 navigate("/")
@@ -44,6 +44,7 @@ const LoginPage = () => {
                     <input type="password" placeholder={"Mot de passe"} name="password" value={cred.password} onChange={onChange}/>
                     <button> Connexion </button>
                 </Form>
+                <p>Pas encore membre ? <Link to={"/register"}>Créer un compte</Link></p>
 
                 {
                     error &&

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api')]
+#[Route('/api/users')]
 class UserController extends AbstractController
 {
     public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
@@ -39,7 +39,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/users', name: 'getAllUsers', methods: ['GET'])]
+    #[Route('/', name: 'getAllUsers', methods: ['GET'])]
     public function getAllUsers(): Response
     {
         $users = $this->userRepository->findAll();
@@ -47,7 +47,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/users', name: 'app_user_new', methods: ['POST'])]
+    #[Route('/register', name: 'app_user_new', methods: ['POST'])]
     public function new(Request $request): Response
     {
         $user = new User();
@@ -56,12 +56,20 @@ class UserController extends AbstractController
         $validKeys = ["email", "password","pseudo"];
         foreach ($data as $key => $value) {
             if ($key == "email") {
+                $userExist = $this->userRepository->findOneBy(['email' => $value]);
+                if($userExist){
+                    return new Response("Email aleready exist", Response::HTTP_BAD_REQUEST);
+                }
                 $user->setEmail($value);
             }
             if ($key == "password") {
                 $user->setPassword($this->hasher->hashPassword($user, $value));
             }
             if ($key == "pseudo") {
+                $userExist = $this->userRepository->findOneBy(['pseudo' => $value]);
+                if($userExist){
+                    return new Response("Pseudo aleready exist", Response::HTTP_BAD_REQUEST);
+                }
                 $user->setPseudo($value);
             }
             if (!in_array($key, $validKeys)) {
@@ -72,13 +80,11 @@ class UserController extends AbstractController
         return $this->makeJsonResponse($user, Response::HTTP_OK);
 
     }
-
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+    public function show(int $id): Response
     {
-        return $this->render('user/show.html.twig', [
-            'user' => $user,
-        ]);
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+        return $this->makeJsonResponse($user, Response::HTTP_OK);
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT', 'PATCH'])]

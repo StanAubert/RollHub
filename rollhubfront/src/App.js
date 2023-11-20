@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import LoginPage from "./components/LoginPage";
+import LoginPage from "./components/Auth/LoginPage";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import HomePage from "./components/HomePage";
 import NotFound from "./components/Base/NotFound";
@@ -10,6 +10,7 @@ import BaseLayout from "./components/Base/BaseLayout";
 import AdminRouter from "./components/Admin/AdminRouter";
 import AuthGuard from "./services/AuthGuard";
 import BaseRouter from "./components/Base/BaseRouter";
+import Register from "./components/Auth/Register";
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
                     </AuthGuard>
                 }/>
                 <Route path={"/login"} element={ <LoginPage/>}/>
+                <Route path={"/register"} element={ <Register/>}/>
 
             </Routes>
         </BrowserRouter>

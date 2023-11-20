@@ -31,6 +31,8 @@ const themeSlice = createSlice({
 
 })
 
+export const { setUsers } = usersSlice.actions
+export const { setCurrUser, setTheme } = themeSlice.actions
 export const store = configureStore({
     reducer: {
         theme: themeSlice.reducer,

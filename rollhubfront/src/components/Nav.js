@@ -6,33 +6,34 @@ import {logout} from "../api";
 import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
 import {useDispatch, useSelector} from "react-redux";
+import {setTheme} from "../redux";
 
-const Nav = ({role}) => {
+const Nav = () => {
     const [isOpenModal, setIsOpenModal] = useState(false)
     const RTheme = useSelector(state => state.theme.theme)
     const currUser = useSelector(state => state.theme.currUser)
-    const [theme, setTheme] = useState(RTheme)
+    const [mode, setMode] = useState(RTheme)
 
 
     const dispatch = useDispatch()
 
     const changeTheme = () => {
-        dispatch({type: "theme/setTheme", payload: theme})
+        dispatch(setTheme(mode))
     }
     useEffect(() => {
-        if(theme !== RTheme){
+        if(mode !== RTheme){
             changeTheme()
         }
-    }, [theme]);
+    }, [mode]);
 
 
     const onChangeMode = () =>{
-        switch (theme){
+        switch (mode){
             case "light":
-                setTheme("dark")
+                setMode("dark")
                 return;
             case "dark":
-                setTheme("light")
+                setMode("light")
                 return;
             default:
                 return;
@@ -56,11 +57,11 @@ const Nav = ({role}) => {
                 <LogoutModal logout={onLogout} close={() => {setIsOpenModal(false)}}/>
             }
             <header>
-                <Navbar className={theme}>
+                <Navbar className={mode}>
                     <ul>
                         <li><Link to={"/home"} >Accueil</Link></li>
                         {
-                            role === "admin" &&
+                            currUser.role === "ROLE_ADMIN" &&
                                 <li><Link to={"/admin"}>Admin</Link></li>
                         }
                         <li> <p>{currUser.pseudo}</p> </li>
@@ -69,7 +70,7 @@ const Nav = ({role}) => {
 
                     <ThemeButton onClick={onChangeMode}>
                         {
-                            theme === "dark" ? <Sun color={"#e3e723"} size={"32"}/> : <Moon color={"lightblue"} size={"32"}/>
+                            mode === "dark" ? <Sun color={"#e3e723"} size={"32"}/> : <Moon color={"lightblue"} size={"32"}/>
                         }
                     </ThemeButton>
                 </Navbar>
@@ -106,5 +107,6 @@ const ThemeButton = styled.button`
   border: none;
   background-color: transparent;
   padding: 0.8rem;
+  cursor: pointer;
 `
 export default Nav

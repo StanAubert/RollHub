@@ -9,12 +9,13 @@ import Register from "./components/Auth/Register";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from "react";
 import {UserService} from "./services/user.service";
+import {setCurrUser} from "./redux";
 
 function App() {
     const dispatch = useDispatch()
     useEffect(() => {
         UserService.currentUser()
-            .then(res => dispatch({type: 'theme/setCurrUser', payload:res.data}))
+            .then(res => dispatch(setCurrUser(res.data)))
             .catch(err => {
                 console.log(err)
             })

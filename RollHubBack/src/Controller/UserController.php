@@ -77,7 +77,7 @@ class UserController extends AbstractController
             }
         }
         $this->persistUser($user);
-        return $this->makeJsonResponse($user, Response::HTTP_OK);
+        return $this->makeJsonResponse($user, Response::HTTP_CREATED);
 
     }
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
@@ -88,21 +88,49 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT', 'PATCH'])]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, UserRepository $userRepository, int $id): Response
     {
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
+        $user = $userRepository->find($id);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        if(!$user){
+            return $this->json(['message' => 'User not found'],404);
         }
+        $validKeys = ["email", "password","pseudo", "firstname", "lastname","roles"];
+        foreach ($data as $key => $value){
+            if ($key == "email") {
+                $userExist = $this->userRepository->findOneBy(['email' => $value]);
+                if($userExist){
+                    return new Response("Email aleready exist", Response::HTTP_BAD_REQUEST);
+                }
+                $user->setEmail($value);
+            }
+            if ($key == "password") {
+                $user->setPassword($this->hasher->hashPassword($user, $value));
+            }
+            if ($key == "pseudo") {
+                $userExist = $this->userRepository->findOneBy(['pseudo' => $value]);
+                if($userExist){
+                    return new Response("Pseudo aleready exist", Response::HTTP_BAD_REQUEST);
+                }
+                $user->setPseudo($value);
+            }
+            if($key == "firstname"){
+                $user->setFirstName($value ?? $user->getFirstName());
+            }
+            if($key == 'lastname'){
+                $user->setLastName($value ?? $user->getLastName());
+            }
+            if($key == 'roles'){
+                $user->setRoles($value ?? $user->getRoles());
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
+        }
+        $this->persistUser($user);
 
-        return $this->render('user/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        return $this->makeJsonResponse($user, Response::HTTP_OK);
     }
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]

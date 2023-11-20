@@ -3,10 +3,9 @@ import Nav from "../Nav";
 import {Outlet, useNavigate} from "react-router-dom";
 
 const AdminLayout = () => {
-    const navigate = useNavigate();
     return (
         <div>
-            <Nav role="admin"/>
+            <Nav/>
             <Outlet/>
         </div>
     );

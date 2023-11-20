@@ -88,7 +88,7 @@ class InfoController extends AbstractController
         $info->setTitle($data['title'] ?? $info->getTitle());
         $info->setContent($data['content'] ?? $info->getContent());
 
-        $entityManager->flush();
+        $this->persistInfo($info);
 
         return $this->json($info);
     }

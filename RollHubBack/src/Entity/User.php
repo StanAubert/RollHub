@@ -42,9 +42,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Spot::class)]
     private Collection $spots;
 
-    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Playlist::class)]
-    private Collection $playlists;
-
     public function __construct()
     {
         $this->spots = new ArrayCollection();
@@ -187,33 +184,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Playlist>
-     */
-    public function getPlaylists(): Collection
-    {
-        return $this->playlists;
-    }
-
-    public function addPlaylist(Playlist $playlist): static
-    {
-        if (!$this->playlists->contains($playlist)) {
-            $this->playlists->add($playlist);
-            $playlist->setAuthor($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlaylist(Playlist $playlist): static
-    {
-        if ($this->playlists->removeElement($playlist)) {
-            // set the owning side to null (unless already changed)
-            if ($playlist->getAuthor() === $this) {
-                $playlist->setAuthor(null);
-            }
-        }
-
-        return $this;
-    }
 }

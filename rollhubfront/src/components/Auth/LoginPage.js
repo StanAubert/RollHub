@@ -5,6 +5,7 @@ import {login} from "../../api";
 import {tokenService} from "../../services/token.service";
 import {Link, useNavigate} from "react-router-dom";
 import {UserService} from "../../services/user.service";
+import {useDispatch} from "react-redux";
 
 
 const LoginPage = () => {
@@ -16,15 +17,19 @@ const LoginPage = () => {
     const loginUrl= login();
     const navigate = useNavigate();
     const currUser = UserService.getUser()
+    const dispatch = useDispatch();
 
     const onSubmit = (e) => {
         e.preventDefault();
         tokenService.login(cred)
             .then( res => {
                 tokenService.saveToken(res.data.token, res.data.data.id)
-                console.log(res)
+                UserService.currentUser()
+                    .then(res => dispatch({type: 'theme/setCurrUser', payload:res.data}))
+                    .catch(err => {
+                        console.log(err)
+                    })
                 navigate("/")
-
             } )
             .catch(err => {
                 setError("Identifiants inconnus")

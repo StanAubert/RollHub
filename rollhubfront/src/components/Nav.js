@@ -6,12 +6,23 @@ import {logout} from "../api";
 import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
 import {UserService} from "../services/user.service";
+import {useDispatch, useSelector} from "react-redux";
 
 const Nav = ({role}) => {
-    const [theme, setTheme] = useState("light")
     const [errorMessage, setErrorMessage] = useState("")
     const [isOpenModal, setIsOpenModal] = useState(false)
-    const [currUser, setCurrUser] = useState({})
+    const RTheme = useSelector(state => state.theme.theme)
+    const currUser = useSelector(state => state.theme.currUser)
+    const [theme, setTheme] = useState(RTheme)
+
+
+    const dispatch = useDispatch()
+
+    const changeTheme = () => dispatch({type: "theme/setTheme", payload: theme})
+    useEffect(() => {
+        changeTheme()
+    }, [theme]);
+
 
     const onChangeMode = () =>{
         switch (theme){
@@ -36,14 +47,6 @@ const Nav = ({role}) => {
         tokenService.logout()
         navigate("/login")
     }
-    useEffect(() => {
-        UserService.currentUser()
-            .then(res => setCurrUser(res.data))
-            .catch(err => {
-                console.log(err)
-            })
-    }, []);
-
     return (
         <>
             {

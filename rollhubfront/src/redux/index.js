@@ -1,11 +1,15 @@
 import {configureStore, createSlice} from "@reduxjs/toolkit";
 
 
-const userSlice = createSlice({
-    name: "User",
+const usersSlice = createSlice({
+    name: "Users",
     initialState: {
-        email: "",
-        pseudo: ""
+        users: {}
+    },
+    reducers: {
+        setUsers: (state, action) => {
+            state.users = action.payload
+        }
     }
 
 })
@@ -30,6 +34,6 @@ const themeSlice = createSlice({
 export const store = configureStore({
     reducer: {
         theme: themeSlice.reducer,
-        user: userSlice.reducer
+        users: usersSlice.reducer
     }
 })

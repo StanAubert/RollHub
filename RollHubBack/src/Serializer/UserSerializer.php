@@ -14,7 +14,8 @@ class UserSerializer
             "roles" => $user->getRoles(),
             "firstName" => $user->getFirstName(),
             "lastName" => $user->getLastName(),
-            "pseudo" => $user->getPseudo()
+            "pseudo" => $user->getPseudo(),
+            "spots" => SpotSerializer::SerializeAllSpots($user->getSpots())
         ];
     }
 

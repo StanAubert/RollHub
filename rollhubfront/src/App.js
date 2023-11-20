@@ -8,8 +8,17 @@ import BaseRouter from "./components/Base/BaseRouter";
 import Register from "./components/Auth/Register";
 import {useDispatch, useSelector} from "react-redux";
 import {useEffect} from "react";
+import {UserService} from "./services/user.service";
 
 function App() {
+    const dispatch = useDispatch()
+    useEffect(() => {
+        UserService.currentUser()
+            .then(res => dispatch({type: 'theme/setCurrUser', payload:res.data}))
+            .catch(err => {
+                console.log(err)
+            })
+    },[])
   return (
     <div className="App">
         <GlobalStyle/>

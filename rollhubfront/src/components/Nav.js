@@ -1,15 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import {Moon, Sun, User} from "react-feather";
+import {Moon, Sun} from "react-feather";
 import {logout} from "../api";
 import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
-import {UserService} from "../services/user.service";
 import {useDispatch, useSelector} from "react-redux";
 
 const Nav = ({role}) => {
-    const [errorMessage, setErrorMessage] = useState("")
     const [isOpenModal, setIsOpenModal] = useState(false)
     const RTheme = useSelector(state => state.theme.theme)
     const currUser = useSelector(state => state.theme.currUser)
@@ -18,9 +16,13 @@ const Nav = ({role}) => {
 
     const dispatch = useDispatch()
 
-    const changeTheme = () => dispatch({type: "theme/setTheme", payload: theme})
+    const changeTheme = () => {
+        dispatch({type: "theme/setTheme", payload: theme})
+    }
     useEffect(() => {
-        changeTheme()
+        if(theme !== RTheme){
+            changeTheme()
+        }
     }, [theme]);
 
 

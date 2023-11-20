@@ -2,17 +2,42 @@
 
 namespace App\Controller;
 use App\Entity\Info;
-use App\Form\InfoType;
+use App\Entity\User;
 use App\Repository\InfoRepository;
+use App\Repository\UserRepository;
+use App\Serializer\InfoSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/info')]
 class InfoController extends AbstractController
 {
+
+    public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
+    {
+
+    }
+
+
+    private function makeJsonResponse($info, int $statusCode): Response
+    {
+        $response = new Response();
+        $jsonContent = is_array($info) ? InfoSerializer::serializeAllInfos($info) : InfoSerializer::serializeOneInfo($info);
+        $response->setContent(json_encode($jsonContent, JSON_THROW_ON_ERROR));
+        $response->headers->set("Content-Type", "application/json");
+        $response->setStatusCode($statusCode);
+        return $response;
+    }
+
+    private function persistInfo(Info $info)
+    {
+        $this->entityManager->persist($info);
+        $this->entityManager->flush();
+    }
     #[Route('/', name: 'app_info_index', methods: ['GET'])]
     public function index(InfoRepository $infoRepository): Response
     {
@@ -30,9 +55,9 @@ class InfoController extends AbstractController
         
         $info = new Info();
         $info->setTitle($data['title']);
-        $info->setContent($data['content']); 
-        $entityManager->persist($info);
-        $entityManager->flush();
+        $info->setContent($data['content']);
+        $info->addInfoCategory($data['categories']);
+        $this->persistInfo($info);
 
         return $this->json($info, 201);
 

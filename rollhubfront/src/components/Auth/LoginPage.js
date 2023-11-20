@@ -24,11 +24,6 @@ const LoginPage = () => {
         tokenService.login(cred)
             .then( res => {
                 tokenService.saveToken(res.data.token, res.data.data.id)
-                UserService.currentUser()
-                    .then(res => dispatch({type: 'theme/setCurrUser', payload:res.data}))
-                    .catch(err => {
-                        console.log(err)
-                    })
                 navigate("/")
             } )
             .catch(err => {

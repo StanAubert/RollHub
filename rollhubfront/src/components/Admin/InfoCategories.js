@@ -1,19 +1,35 @@
 import React, {useEffect, useState} from 'react';
 import {InfoCategoryService} from "../../services/info.category.service";
 import {Table} from "./Users";
+import styled from "styled-components";
+import {InfoCategoryForm} from "../Forms/InfoCategoryForms";
 
 const InfoCategories = () => {
     const [infoCategories, setInfoCategories] = useState()
     const [error, setError] = useState();
+    const [openForm, setOpenForm] = useState(false)
 
     useEffect(() => {
         InfoCategoryService.getAllInfoCategories()
             .then(res => {setInfoCategories(res.data)})
             .catch(err => {setError(err)})
     }, []);
+
+    const onOpenForm = () => {
+        setOpenForm(true)
+    }
+
+    const onCloseForm = () => {
+        setOpenForm(false)
+    }
     return (
         <div>
+            {
+                openForm &&
+                <InfoCategoryForm close={onCloseForm}/>
+            }
             <h1>Infos-Catégories</h1>
+            <AddButton onClick={onOpenForm}> Ajouter une catégorie</AddButton>
             <Table>
                 <thead>
                 <tr>
@@ -39,5 +55,11 @@ const InfoCategories = () => {
         </div>
     );
 };
-
+const AddButton = styled.button`
+  border: none;
+  background: seagreen;
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+`
 export default InfoCategories;

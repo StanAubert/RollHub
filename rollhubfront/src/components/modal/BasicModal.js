@@ -9,11 +9,14 @@ const BasicModal = () => {
     );
 };
 
-const Blur = styled.div`
+export const Blur = styled.div`
   background-color: rgba(0,0,0,0.5);
   position: absolute;
+  top: 0;
   filter: blur(px);
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 `
 export default BasicModal;

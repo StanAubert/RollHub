@@ -120,7 +120,7 @@ class InfoCategoryController extends AbstractController
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
             }
         }
-
+        $this->persistInfoCategory($infoCategory);
         return $this->makeJsonResponse($infoCategory, Response::HTTP_OK);
     }
 

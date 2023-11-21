@@ -13,7 +13,7 @@ class SpotSerializer
             'name' => $spot->getName(),
             'latitude' => $spot->getLatitude(),
             'longitude' => $spot->getLongitude(),
-            'Author' => UserSerializer::serializeOneUser($spot->getAuthor()),
+            'Author' => UserSerializer::serializeOneUserForSpot($spot->getAuthor()),
         ];
     }
 
@@ -22,9 +22,28 @@ class SpotSerializer
         $response = [];
 
         foreach ($spots as $spot)
-        {
-            array_push($response, SpotSerializer::SerializeOneSpot($spot));
-        }
+            $response[] = SpotSerializer::SerializeOneSpot($spot);
+
+        return $response;
+    }
+
+    public static function SerializeOneSpotForUser(Spot $spot) : array
+    {
+        return[
+            'id' => $spot->getId(),
+            'name' => $spot->getName(),
+            'latitude' => $spot->getLatitude(),
+            'longitude' => $spot->getLongitude(),
+            'author' => $spot->getAuthor()->getId(),
+        ];
+    }
+
+    public static function SerializeAllSpotsForUser($spots): array
+    {
+        $response = [];
+
+        foreach ($spots as $spot)
+            $response[] = SpotSerializer::SerializeOneSpotForUser($spot);
 
         return $response;
     }

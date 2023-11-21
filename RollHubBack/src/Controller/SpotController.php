@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Spot;
 use App\Repository\SpotRepository;
+use App\Repository\UserRepository;
 use App\Serializer\SpotSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,11 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/spot')]
+#[Route('/api/spot')]
 class SpotController extends AbstractController
 {
 
-    public function __construct(private readonly EntityManagerInterface $entityManager,private SpotRepository $spotRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager,private SpotRepository $spotRepository, private UserRepository $userRepository)
     {
 
     }
@@ -51,7 +52,7 @@ class SpotController extends AbstractController
         $validKeys = ['name', 'latitude', 'longitude', 'author'];
         foreach ($data as $key => $value){
             if($key == 'name'){
-                $spotExists = $this->spotRepository->findOneBy(['name' == $value]);
+                $spotExists = $this->spotRepository->findOneBy(['name' => $value]);
                 if($spotExists){
                     return new Response("SpotName already exists", Response::HTTP_BAD_REQUEST);
                 }
@@ -64,15 +65,19 @@ class SpotController extends AbstractController
                 $spot->setLongitude($value);
             }
             if($key == 'author'){
-                $spot->setAuthor($value);
+                $author = $this->userRepository->find($value);
+                if(!$author){
+                    return new Response('Nos user found', Response::HTTP_NOT_FOUND);
+                }
+                $spot->setAuthor($author);
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
             }
         }
         if(array_key_exists('latitude', $data) && array_key_exists('longitude', $data) ){
-            $latExists = $this->spotRepository->findOneBy(['latitude', $spot->getLatitude()]);
-            $longExists = $this->spotRepository->findOneBy(['longitude', $spot->getLongitude()]);
+            $latExists = $this->spotRepository->findOneBy(['latitude'=> $spot->getLatitude()]);
+            $longExists = $this->spotRepository->findOneBy(['longitude' => $spot->getLongitude()]);
 
             if($latExists && $longExists){
                 return new Response("Spot Already exists", Response::HTTP_BAD_REQUEST);
@@ -101,7 +106,7 @@ class SpotController extends AbstractController
         $validKeys = ['name', 'latitude', 'longitude'];
         foreach ($data as $key => $value){
             if($key == 'name'){
-                $spotExists = $this->spotRepository->findOneBy(['name' == $value]);
+                $spotExists = $this->spotRepository->findOneBy(['name' => $value]);
                 if($spotExists){
                     return new Response("SpotName already exists", Response::HTTP_BAD_REQUEST);
                 }
@@ -118,8 +123,8 @@ class SpotController extends AbstractController
             }
         }
         if(array_key_exists('latitude', $data) && array_key_exists('longitude', $data) ){
-            $latExists = $this->spotRepository->findOneBy(['latitude', $spot->getLatitude()]);
-            $longExists = $this->spotRepository->findOneBy(['longitude', $spot->getLongitude()]);
+            $latExists = $this->spotRepository->findOneBy(['latitude'=> $spot->getLatitude()]);
+            $longExists = $this->spotRepository->findOneBy(['longitude'=> $spot->getLongitude()]);
 
             if($latExists && $longExists){
                 return new Response("Spot Already exists", Response::HTTP_BAD_REQUEST);

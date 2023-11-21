@@ -15,7 +15,7 @@ class UserSerializer
             "firstName" => $user->getFirstName(),
             "lastName" => $user->getLastName(),
             "pseudo" => $user->getPseudo(),
-            "spots" => SpotSerializer::SerializeAllSpots($user->getSpots())
+            "spots" => SpotSerializer::SerializeAllSpotsForUser($user->getSpots())
         ];
     }
 
@@ -24,7 +24,30 @@ class UserSerializer
         $response = [];
 
         foreach ($users as $u) {
-            array_push($response, UserSerializer::serializeOneUser($u));
+            $response[] = UserSerializer::serializeOneUser($u);
+        }
+
+        return $response;
+    }
+
+    public static function serializeOneUserForSpot(User $user): array
+    {
+        return [
+            "id" => $user->getId(),
+            "email" => $user->getEmail(),
+            "roles" => $user->getRoles(),
+            "firstName" => $user->getFirstName(),
+            "lastName" => $user->getLastName(),
+            "pseudo" => $user->getPseudo(),
+        ];
+    }
+
+    public static function serializeAllUsersForSpot($users): array
+    {
+        $response = [];
+
+        foreach ($users as $u) {
+            $response[] = UserSerializer::serializeOneUserForSpot($u);
         }
 
         return $response;

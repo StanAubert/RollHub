@@ -12,7 +12,7 @@ class InfoSerializer
             "id" => $info->getId(),
             "title" => $info->getTitle(),
             "content" => $info->getContent(),
-            "categories" => InfoCategorySerializer::SerializeAllInfoCategories($info->getInfoCategories())
+            "categories" => InfoCategorySerializer::SerializeAllInfoCategoriesForInfo($info->getInfoCategories())
         ];
     }
 

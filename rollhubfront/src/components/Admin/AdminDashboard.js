@@ -6,11 +6,6 @@ const AdminDashboard = () => {
     return (
         <div>
             <h2>RollHub Admin</h2>
-            <div>
-                <Link to="users"> Utilisateurs</Link>
-                <Link to="infos"> Infos</Link>
-                <Link to="spots"> Spots</Link>
-            </div>
         </div>
     );
 };

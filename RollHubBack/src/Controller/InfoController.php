@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Entity\Info;
+use App\Repository\InfoCategoryRepository;
 use App\Repository\InfoRepository;
 use App\Serializer\InfoSerializer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class InfoController extends AbstractController
 {
 
-    public function __construct(private readonly EntityManagerInterface $entityManager,private InfoRepository $infoRepository )
+    public function __construct(private readonly EntityManagerInterface $entityManager,private InfoRepository $infoRepository, private InfoCategoryRepository $infoCategoryRepository )
     {
 
     }
@@ -64,7 +65,13 @@ class InfoController extends AbstractController
                 $info->setContent($value);
             }
             if($key == "categories"){
-                $info->addInfoCategory($value);
+                foreach ($value as $v){
+                    $infoCat = $this->infoCategoryRepository->find($v);
+                    if(!$infoCat){
+                        return new Response('Category not found', Response::HTTP_NOT_FOUND);
+                    }
+                    $info->addInfoCategory($infoCat);
+                }
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
@@ -112,7 +119,30 @@ class InfoController extends AbstractController
                 $info->setContent($value);
             }
             if($key == "categories"){
-                $info->addInfoCategory($value);
+
+                $categoriesToRemove = [];
+                foreach ($info->getInfoCategories() as $existingCategory) {
+                    $categoryId = $existingCategory->getId();
+
+                    if (!in_array($categoryId, $value)) {
+                        $categoriesToRemove[] = $existingCategory;
+                    }
+                }
+
+                foreach ($categoriesToRemove as $categoryToRemove) {
+                    $info->removeInfoCategory($categoryToRemove);
+                }
+
+                foreach ($value as $v){
+                    $infoCat = $this->infoCategoryRepository->find($v);
+                    if(!$infoCat){
+                        return new Response('Category not found', Response::HTTP_NOT_FOUND);
+                    }
+                    if(!$info->getInfoCategories()->contains($infoCat)){
+                        $info->addInfoCategory($infoCat);
+                        $infoCat->addInfo($info);
+                    }
+                }
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);

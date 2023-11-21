@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\InfoCategory;
 use App\Repository\InfoCategoryRepository;
+use App\Repository\InfoRepository;
 use App\Serializer\InfoCategorySerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,11 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/info/category')]
+#[Route('api/info/category')]
 class InfoCategoryController extends AbstractController
 {
 
-    public function __construct(private readonly EntityManagerInterface $entityManager, private InfoCategoryRepository $infoCategoryRepository )
+    public function __construct(private readonly EntityManagerInterface $entityManager, private InfoCategoryRepository $infoCategoryRepository, private InfoRepository $infoRepository)
     {
 
     }
@@ -56,14 +57,14 @@ class InfoCategoryController extends AbstractController
 
         foreach ($data as $key => $value){
             if($key == 'title'){
-                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' == $value]);
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' => $value]);
                 if($infoCategoryExists){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $infoCategory->setTitle($value);
             }
             if($key == 'color'){
-                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' == $value]);
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' => $value]);
                 if($infoCategoryExists){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }
@@ -101,14 +102,14 @@ class InfoCategoryController extends AbstractController
 
         foreach ($data as $key => $value){
             if($key == 'title'){
-                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' == $value]);
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' => $value]);
                 if($infoCategoryExists){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $infoCategory->setTitle($value);
             }
             if($key == 'color'){
-                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' == $value]);
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' => $value]);
                 if($infoCategoryExists){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }

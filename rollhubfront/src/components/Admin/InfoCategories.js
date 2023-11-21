@@ -1,35 +1,35 @@
 import React, {useEffect, useState} from 'react';
+import {InfoCategoryService} from "../../services/info.category.service";
 import {Table} from "./Users";
-import {InfoService} from "../../services/Info.service";
 
-const Infos = () => {
-    const [infos, setInfos] = useState([])
-    const [error, setError] = useState("")
+const InfoCategories = () => {
+    const [infoCategories, setInfoCategories] = useState()
+    const [error, setError] = useState();
+
     useEffect(() => {
-        InfoService.getAllInfos()
-            .then(res => {setInfos(res.data)})
-            .catch(err => {setError(err.message)} )
+        InfoCategoryService.getAllInfoCategories()
+            .then(res => {setInfoCategories(res.data)})
+            .catch(err => {setError(err)})
     }, []);
-
     return (
         <div>
-            <h1>Infos</h1>
+            <h1>Infos-Catégories</h1>
             <Table>
                 <thead>
                 <tr>
                     <th> # </th>
                     <th>Titre</th>
-                    <th>Contenu</th>
+                    <th>Couleur</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                {infos.map(i => {
+                {infoCategories?.map(i => {
                     return (
-                        <tr>
+                        <tr key={"row-" + i.id}>
                             <td>{i.id}</td>
                             <td>{i.title}</td>
-                            <td>{i.content}</td>
+                            <td style={{background:i.color}}></td>
                             <td> Modifier / Supprimer </td>
                         </tr>
                     )
@@ -40,4 +40,4 @@ const Infos = () => {
     );
 };
 
-export default Infos;
+export default InfoCategories;

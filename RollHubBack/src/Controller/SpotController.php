@@ -107,7 +107,7 @@ class SpotController extends AbstractController
         foreach ($data as $key => $value){
             if($key == 'name'){
                 $spotExists = $this->spotRepository->findOneBy(['name' => $value]);
-                if($spotExists){
+                if($spotExists && ($value !== $spot->getName())){
                     return new Response("SpotName already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $spot->setName($value);

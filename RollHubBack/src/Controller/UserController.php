@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\SpotRepository;
 use App\Repository\UserRepository;
 use App\Serializer\UserSerializer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/users')]
 class UserController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository, private SpotRepository $spotRepository)
     {
 
     }
@@ -96,7 +97,7 @@ class UserController extends AbstractController
         if(!$user){
             return $this->json(['message' => 'User not found'],Response::HTTP_NOT_FOUND);
         }
-        $validKeys = ["email", "password","pseudo", "firstname", "lastname","roles"];
+        $validKeys = ["email", "password","pseudo", "firstname", "lastname","roles", "spots"];
         foreach ($data as $key => $value){
             if ($key == "email") {
                 $userExist = $this->userRepository->findOneBy(['email' => $value]);
@@ -123,6 +124,30 @@ class UserController extends AbstractController
             }
             if($key == 'roles'){
                 $user->setRoles($value ?? $user->getRoles());
+            }
+            if($key == 'spots'){
+                $spotsToRemove = [];
+                foreach ($user->getSpots() as $existingSpot){
+                    $spotId = $existingSpot->getId();
+                    if(!in_array($spotId, $value)){
+                        $spotsToRemove[] = $existingSpot;
+                    }
+                }
+                foreach ($spotsToRemove as $spotToRemove){
+                    $user->removeSpot($spotToRemove);
+                }
+
+                foreach ($value as $v){
+                    $spot = $this->spotRepository->find($v);
+                    if(!$spot){
+                        return new Response("No spot found", Response::HTTP_NOT_FOUND);
+                    }
+                    if(!$user->getSpots()->contains($spot)){
+                        $user->addSpot($spot);
+                        $spot->setAuthor($user);
+                    }
+                }
+                $user->addSpot($value);
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);

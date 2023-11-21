@@ -1,4 +1,5 @@
 import React from 'react';
+import LoaderDouble from "./LoaderDouble";
 
 const HomePage = () => {
     return (

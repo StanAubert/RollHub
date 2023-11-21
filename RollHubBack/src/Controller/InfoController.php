@@ -2,22 +2,19 @@
 
 namespace App\Controller;
 use App\Entity\Info;
-use App\Entity\User;
 use App\Repository\InfoRepository;
-use App\Repository\UserRepository;
 use App\Serializer\InfoSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/info')]
 class InfoController extends AbstractController
 {
 
-    public function __construct(private readonly EntityManagerInterface $entityManager, private UserPasswordHasherInterface $hasher, private UserRepository $userRepository)
+    public function __construct(private readonly EntityManagerInterface $entityManager,private InfoRepository $infoRepository )
     {
 
     }
@@ -39,64 +36,99 @@ class InfoController extends AbstractController
         $this->entityManager->flush();
     }
     #[Route('/', name: 'app_info_index', methods: ['GET'])]
-    public function index(InfoRepository $infoRepository): Response
+    public function index(): Response
     {
-        $infos = $infoRepository->findAll();
-        return $this->json($infos, Response::HTTP_OK);
+        $infos = $this->infoRepository->findAll();
+        return $this->makeJsonResponse($infos, Response::HTTP_OK);
     }
 
     #[Route('/new', name: 'app_info_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
         if ($data === null) {
             return $this->json(['message' => 'Invalid JSON'], 400);
         }
-        
         $info = new Info();
-        $info->setTitle($data['title']);
-        $info->setContent($data['content']);
-        $info->addInfoCategory($data['categories']);
+        $validKeys = ['title', 'content', 'categories'];
+
+        foreach ($data as $key => $value){
+            if($key == "title"){
+                $infoExists = $this->infoRepository->findOneBy(['title' => $value]);
+                if($infoExists){
+                    return new Response("Info already exists");
+                }
+                $info->setTitle($value);
+            }
+            if($key == "content"){
+                $info->setContent($value);
+            }
+            if($key == "categories"){
+                $info->addInfoCategory($value);
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
+        }
         $this->persistInfo($info);
 
-        return $this->json($info, 201);
+        return $this->makeJsonResponse($info, Response::HTTP_CREATED);
 
     }
 
     #[Route('/{id}', name: 'app_info_show', methods: ['GET'])]
-    public function show(InfoRepository $infoRepository, int $id): Response
+    public function show(int $id): Response
     {
-        $info = $infoRepository->find($id);
+        $info = $this->infoRepository->find($id);
         
         if (!$info) {
             return $this->json(['message' => 'Infos not found'], 404);
         }
 
-        return $this->json($info);
+        return $this->makeJsonResponse($info, Response::HTTP_OK);
     }
 
     #[Route('/{id}/edit', name: 'app_info_edit', methods: ['PUT', 'PATCH'])]
-    public function edit(Request $request, InfoRepository $infoRepository, EntityManagerInterface $entityManager, int $id): Response
+    public function edit(Request $request, int $id): Response
     {
         $data = json_decode($request->getContent(), true);
-        $info = $infoRepository->find($id);
+        $info = $this->infoRepository->find($id);
 
         if (!$info) {
             return $this->json(['message' => 'InfoCategory not found'], 404);
         }
 
-        $info->setTitle($data['title'] ?? $info->getTitle());
-        $info->setContent($data['content'] ?? $info->getContent());
+        $validKeys = ['title', 'content', 'categories'];
+
+        foreach ($data as $key => $value){
+            if($key == "title"){
+                $infoExists = $this->infoRepository->findOneBy(['title' => $value]);
+                if($infoExists && ($value !== $info->getTitle())){
+                    return new Response("Info already exists");
+                }
+                $info->setTitle($value);
+            }
+            if($key == "content"){
+                $info->setContent($value);
+            }
+            if($key == "categories"){
+                $info->addInfoCategory($value);
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
+        }
+        $this->persistInfo($info);
 
         $this->persistInfo($info);
 
-        return $this->json($info);
+        return $this->makeJsonResponse($info, Response::HTTP_OK);
     }
 
     #[Route('/{id}', name: 'app_info_delete', methods: ['DELETE'])]
-    public function delete(InfoRepository $infoRepository,int $id , EntityManagerInterface $entityManager): Response
+    public function delete(int $id , EntityManagerInterface $entityManager): Response
     {
-        $info = $infoRepository->find($id);
+        $info = $this->infoRepository->find($id);
 
         if (!$info) {
             return $this->json(['message' => 'info not found'], 404);
@@ -105,6 +137,6 @@ class InfoController extends AbstractController
         $entityManager->remove($info);
         $entityManager->flush();
 
-        return $this->json(['message' => 'Infos deleted']);
+        return $this->json(['message' => 'Info deleted']);
     }
 }

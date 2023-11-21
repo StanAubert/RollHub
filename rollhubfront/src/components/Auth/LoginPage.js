@@ -6,6 +6,8 @@ import {tokenService} from "../../services/token.service";
 import {Link, useNavigate} from "react-router-dom";
 import {UserService} from "../../services/user.service";
 import {useDispatch} from "react-redux";
+import {setCurrUser} from "../../redux";
+import LoaderDouble from "../LoaderDouble";
 
 
 const LoginPage = () => {
@@ -14,6 +16,7 @@ const LoginPage = () => {
         password: ""
     })
     const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
     const loginUrl= login();
     const navigate = useNavigate();
     const currUser = UserService.getUser()
@@ -21,9 +24,16 @@ const LoginPage = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        setLoading(true)
         tokenService.login(cred)
             .then( res => {
                 tokenService.saveToken(res.data.token, res.data.data.id)
+                UserService.currentUser()
+                    .then(res => dispatch(setCurrUser(res.data)))
+                    .catch(err => {
+                        console.log(err)
+                    })
+                setLoading(false)
                 navigate("/")
             } )
             .catch(err => {
@@ -48,7 +58,14 @@ const LoginPage = () => {
                     <button> Connexion </button>
                 </Form>
                 <p>Pas encore membre ? <Link to={"/register"}>Créer un compte</Link></p>
+                {
+                    loading &&
+                    <>
+                        <p> Veuillez patienter </p>
+                        <LoaderDouble/>
+                    </>
 
+                }
                 {
                     error &&
                     <ErrorMessage>

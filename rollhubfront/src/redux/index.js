@@ -26,13 +26,16 @@ const themeSlice = createSlice({
         },
         setTheme: (state, action) => {
             state.theme = action.payload
+        },
+        clearCurrUser: (state, action) => {
+            state.currUser = ""
         }
     }
 
 })
 
 export const { setUsers } = usersSlice.actions
-export const { setCurrUser, setTheme } = themeSlice.actions
+export const { setCurrUser, setTheme, clearCurrUser } = themeSlice.actions
 export const store = configureStore({
     reducer: {
         theme: themeSlice.reducer,

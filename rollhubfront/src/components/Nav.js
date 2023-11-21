@@ -6,12 +6,13 @@ import {logout} from "../api";
 import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
 import {useDispatch, useSelector} from "react-redux";
-import {setTheme} from "../redux";
+import {clearCurrUser, setTheme} from "../redux";
 
 const Nav = () => {
     const [isOpenModal, setIsOpenModal] = useState(false)
     const RTheme = useSelector(state => state.theme.theme)
     const currUser = useSelector(state => state.theme.currUser)
+    const isAdmin = currUser?.roles?.includes("ROLE_ADMIN")
     const [mode, setMode] = useState(RTheme)
 
 
@@ -48,6 +49,7 @@ const Nav = () => {
     const navigate = useNavigate();
     const onLogout = () => {
         tokenService.logout()
+        dispatch(clearCurrUser())
         navigate("/login")
     }
     return (
@@ -61,7 +63,7 @@ const Nav = () => {
                     <ul>
                         <li><Link to={"/home"} >Accueil</Link></li>
                         {
-                            currUser.role === "ROLE_ADMIN" &&
+                            isAdmin &&
                                 <li><Link to={"/admin"}>Admin</Link></li>
                         }
                         <li> <p>{currUser.pseudo}</p> </li>

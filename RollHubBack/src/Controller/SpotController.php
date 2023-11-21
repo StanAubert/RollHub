@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Spot;
-use App\Form\SpotType;
 use App\Repository\SpotRepository;
+use App\Serializer\SpotSerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,68 +14,130 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/spot')]
 class SpotController extends AbstractController
 {
-    #[Route('/', name: 'app_spot_index', methods: ['GET'])]
-    public function index(SpotRepository $spotRepository): Response
+
+    public function __construct(private readonly EntityManagerInterface $entityManager,private SpotRepository $spotRepository)
     {
-        return $this->render('spot/index.html.twig', [
-            'spots' => $spotRepository->findAll(),
-        ]);
+
+    }
+
+
+    private function makeJsonResponse($spot, int $statusCode): Response
+    {
+        $response = new Response();
+        $jsonContent = is_array($spot) ? SpotSerializer::SerializeAllSpots($spot) : SpotSerializer::SerializeOneSpot($spot);
+        $response->setContent(json_encode($jsonContent, JSON_THROW_ON_ERROR));
+        $response->headers->set("Content-Type", "application/json");
+        $response->setStatusCode($statusCode);
+        return $response;
+    }
+
+    private function persistSpot(Spot $spot)
+    {
+        $this->entityManager->persist($spot);
+        $this->entityManager->flush();
+    }
+    #[Route('/', name: 'app_spot_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        $spots =  $this->spotRepository->findAll();
+        return $this->makeJsonResponse($spots, Response::HTTP_OK);
     }
 
     #[Route('/new', name: 'app_spot_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $spot = new Spot();
-        $form = $this->createForm(SpotType::class, $spot);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($spot);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_spot_index', [], Response::HTTP_SEE_OTHER);
+        $data = json_decode($request->getContent(), true, 512,JSON_THROW_ON_ERROR);
+        $validKeys = ['name', 'latitude', 'longitude', 'author'];
+        foreach ($data as $key => $value){
+            if($key == 'name'){
+                $spotExists = $this->spotRepository->findOneBy(['name' == $value]);
+                if($spotExists){
+                    return new Response("SpotName already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $spot->setName($value);
+            }
+            if($key == 'latitude'){
+                $spot->setLatitude($value);
+            }
+            if($key == 'longitude'){
+                $spot->setLongitude($value);
+            }
+            if($key == 'author'){
+                $spot->setAuthor($value);
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
         }
+        if(array_key_exists('latitude', $data) && array_key_exists('longitude', $data) ){
+            $latExists = $this->spotRepository->findOneBy(['latitude', $spot->getLatitude()]);
+            $longExists = $this->spotRepository->findOneBy(['longitude', $spot->getLongitude()]);
 
-        return $this->render('spot/new.html.twig', [
-            'spot' => $spot,
-            'form' => $form,
-        ]);
+            if($latExists && $longExists){
+                return new Response("Spot Already exists", Response::HTTP_BAD_REQUEST);
+            }
+        }
+        $this->persistSpot($spot);
+        return $this->makeJsonResponse($spot, Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'app_spot_show', methods: ['GET'])]
-    public function show(Spot $spot): Response
+    public function show(int$id): Response
     {
-        return $this->render('spot/show.html.twig', [
-            'spot' => $spot,
-        ]);
+        $spot = $this->spotRepository->find($id);
+        return $this->makeJsonResponse($spot, Response::HTTP_OK);
     }
 
-    #[Route('/{id}/edit', name: 'app_spot_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Spot $spot, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_spot_edit', methods: ['PUT', 'PATCH'])]
+    public function edit(Request $request,int $id): Response
     {
-        $form = $this->createForm(SpotType::class, $spot);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true, 512,JSON_THROW_ON_ERROR);
+        $spot = $this->spotRepository->find($id);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_spot_index', [], Response::HTTP_SEE_OTHER);
+        if(!$spot){
+            return new Response("Spot not found", Response::HTTP_NOT_FOUND);
         }
+        $validKeys = ['name', 'latitude', 'longitude'];
+        foreach ($data as $key => $value){
+            if($key == 'name'){
+                $spotExists = $this->spotRepository->findOneBy(['name' == $value]);
+                if($spotExists){
+                    return new Response("SpotName already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $spot->setName($value);
+            }
+            if($key == 'latitude'){
+                $spot->setLatitude($value);
+            }
+            if($key == 'longitude'){
+                $spot->setLongitude($value);
+            }
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
+        }
+        if(array_key_exists('latitude', $data) && array_key_exists('longitude', $data) ){
+            $latExists = $this->spotRepository->findOneBy(['latitude', $spot->getLatitude()]);
+            $longExists = $this->spotRepository->findOneBy(['longitude', $spot->getLongitude()]);
 
-        return $this->render('spot/edit.html.twig', [
-            'spot' => $spot,
-            'form' => $form,
-        ]);
+            if($latExists && $longExists){
+                return new Response("Spot Already exists", Response::HTTP_BAD_REQUEST);
+            }
+        }
+        $this->persistSpot($spot);
+        return $this->makeJsonResponse($spot, Response::HTTP_OK);
     }
 
-    #[Route('/{id}', name: 'app_spot_delete', methods: ['POST'])]
-    public function delete(Request $request, Spot $spot, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_spot_delete', methods: ['DELETE'])]
+    public function delete(int $id,): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$spot->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($spot);
-            $entityManager->flush();
+        $spot = $this->spotRepository->find($id);
+        if(!$spot){
+            return new Response("Spot not found", Response::HTTP_NOT_FOUND);
         }
-
-        return $this->redirectToRoute('app_spot_index', [], Response::HTTP_SEE_OTHER);
+        $this->entityManager->remove($spot);
+        $this->entityManager->flush();
+        return $this->json(['message' => 'Spot deleted'], Response::HTTP_OK);
     }
 }

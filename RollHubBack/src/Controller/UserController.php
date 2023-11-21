@@ -56,9 +56,9 @@ class UserController extends AbstractController
         $validKeys = ["email", "password","pseudo"];
         foreach ($data as $key => $value) {
             if ($key == "email") {
-                $userExist = $this->userRepository->findOneBy(['email' => $value]);
-                if($userExist){
-                    return new Response("Email aleready exist", Response::HTTP_BAD_REQUEST);
+                $userExists = $this->userRepository->findOneBy(['email' => $value]);
+                if($userExists){
+                    return new Response("Email already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $user->setEmail($value);
             }
@@ -66,9 +66,9 @@ class UserController extends AbstractController
                 $user->setPassword($this->hasher->hashPassword($user, $value));
             }
             if ($key == "pseudo") {
-                $userExist = $this->userRepository->findOneBy(['pseudo' => $value]);
-                if($userExist){
-                    return new Response("Pseudo aleready exist", Response::HTTP_BAD_REQUEST);
+                $userExists = $this->userRepository->findOneBy(['pseudo' => $value]);
+                if($userExists){
+                    return new Response("Pseudo already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $user->setPseudo($value);
             }
@@ -88,13 +88,13 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT', 'PATCH'])]
-    public function edit(Request $request, UserRepository $userRepository, int $id): Response
+    public function edit(Request $request, int $id): Response
     {
         $data = json_decode($request->getContent(), true);
-        $user = $userRepository->find($id);
+        $user = $this->userRepository->find($id);
 
         if(!$user){
-            return $this->json(['message' => 'User not found'],404);
+            return $this->json(['message' => 'User not found'],Response::HTTP_NOT_FOUND);
         }
         $validKeys = ["email", "password","pseudo", "firstname", "lastname","roles"];
         foreach ($data as $key => $value){
@@ -103,17 +103,17 @@ class UserController extends AbstractController
                 if($userExist){
                     return new Response("Email aleready exist", Response::HTTP_BAD_REQUEST);
                 }
-                $user->setEmail($value);
+                $user->setEmail($value ?? $user->getEmail());
             }
             if ($key == "password") {
                 $user->setPassword($this->hasher->hashPassword($user, $value));
             }
             if ($key == "pseudo") {
                 $userExist = $this->userRepository->findOneBy(['pseudo' => $value]);
-                if($userExist){
+                if($userExist && ($value !== $user->getPseudo())){
                     return new Response("Pseudo aleready exist", Response::HTTP_BAD_REQUEST);
                 }
-                $user->setPseudo($value);
+                $user->setPseudo($value ?? $user->getPseudo());
             }
             if($key == "firstname"){
                 $user->setFirstName($value ?? $user->getFirstName());
@@ -133,14 +133,16 @@ class UserController extends AbstractController
         return $this->makeJsonResponse($user, Response::HTTP_OK);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    public function delete(int $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
+        $user = $this->userRepository->find($id);
+        if(!$user){
+            return new Response('User not found', Response::HTTP_NOT_FOUND);
         }
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
 
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        return new Response("User deleted", Response::HTTP_OK);
     }
 }

@@ -97,10 +97,12 @@ const Users = () => {
     );
 };
 export const Table = styled.table`
-    font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 95%;
-    margin: 2rem auto auto auto;
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 95%;
+  margin: 2rem auto auto auto;
+  height:200px ;
+  overflow: auto;
 
   td,th {
     border: 1px solid #ddd;

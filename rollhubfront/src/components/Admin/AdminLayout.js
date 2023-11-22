@@ -41,7 +41,7 @@ const SubNav = styled.nav`
   
   .selected{
     border-top: 2px solid var(--color-green);
-    box-shadow: 1px 6px 20px -10px var(--color-green);
+    box-shadow: 1px 2px 16px 1px rgba(0,0,0,0.3);
   }
 `
 

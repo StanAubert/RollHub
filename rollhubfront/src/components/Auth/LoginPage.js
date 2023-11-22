@@ -19,7 +19,6 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false)
     const loginUrl= login();
     const navigate = useNavigate();
-    const currUser = UserService.getUser()
     const dispatch = useDispatch();
 
     const onSubmit = (e) => {

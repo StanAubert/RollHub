@@ -5,7 +5,7 @@ let getAllUsers = () => {
 }
 
 let getUser = (id) => {
-
+    return Axios.get(`/users/${id}`)
 }
 
 const currentUser = () => {
@@ -13,6 +13,12 @@ const currentUser = () => {
     return Axios.get(`/users/${id}`)
 }
 
+const editUser = (id, data) => {
+    return Axios.put(`/users/${id}/edit`, data)
+}
+const deleteUser = (id) => {
+    return Axios.delete(`/users/${id}`)
+}
 export const UserService = {
-    getAllUsers, getUser, currentUser
+    getAllUsers, getUser, currentUser, deleteUser, editUser
 }

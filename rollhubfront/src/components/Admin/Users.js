@@ -1,9 +1,36 @@
 import React, {useEffect, useState} from 'react';
 import {UserService} from "../../services/user.service";
 import styled from "styled-components";
+import {PenTool, Trash} from "react-feather";
+import {InfoService} from "../../services/Info.service";
+import {UserForm} from "../Forms/userForm";
 
 const Users = () => {
     const [users, setUsers] = useState([])
+    const [infoCategories, setInfoCategories] = useState({})
+    const [error, setError] = useState("")
+    const [responseMessage, setResponseMessage] = useState()
+    const [openForm, setOpenForm] = useState(false)
+    const [user, setUser] = useState({})
+
+    const onOpenForm = () => {
+        setOpenForm(true)
+    }
+    const onCloseForm = () => {
+        setOpenForm(false)
+        setUser({})
+    }
+    const updateUser = (i) => {
+        setUser(i)
+        setOpenForm(true)
+    }
+
+    const deleteUser = (i) => {
+        UserService.deleteUser(i)
+            .then(res => setResponseMessage(res.data))
+            .catch(err => setResponseMessage(err.message))
+    }
+
     useEffect(() => {
         UserService.getAllUsers()
             .then(res => {setUsers(res.data)})
@@ -11,6 +38,10 @@ const Users = () => {
     }, []);
     return (
         <div>
+            {
+                openForm &&
+                <UserForm user={user} close={onCloseForm}/>
+            }
             <h1>Utilisateurs</h1>
                 <Table>
                     <thead>
@@ -33,8 +64,10 @@ const Users = () => {
                                 <td>{u.email}</td>
                                 <td>{u.firstName ?? "/"}</td>
                                 <td>{u.lastName ?? "/"} </td>
-                                <td>{u.roles.map( r => `${r} `)}</td>
-                                <td> Modifier / Supprimer </td>
+                                <td>{u.roles.includes("ROLE_ADMIN") ? "Adminisatrateur" : "Utilisateur"}</td>
+                                <td> <ActionButtons onClick={() => {updateUser(u)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
+                                    /
+                                    <ActionButtons onClick={() => {deleteUser(u.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
                             </tr>
                         )
                     })}
@@ -65,6 +98,21 @@ export const Table = styled.table`
     background-color: #04AA6D;
     color: white;
   }
+`
+
+const AddButton = styled.button`
+  border: none;
+  background: seagreen;
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+`
+const ActionButtons = styled.button`
+  border: none;
+  padding: 0.5rem;
+  border-radius: 15px;
+  background: transparent;
+  cursor: pointer;
 `
 
 

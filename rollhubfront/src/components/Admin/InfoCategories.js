@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {InfoCategoryService} from "../../services/info.category.service";
 import {Table} from "./Users";
 import styled from "styled-components";
-import {InfoCategoryForm} from "../Forms/InfoCategoryForms";
+import {InfoCategoryForm} from "../Forms/InfoCategoryForm";
 import {useDispatch} from "react-redux";
+import {PenTool, Trash} from "react-feather";
 
 const InfoCategories = () => {
     const [infoCategories, setInfoCategories] = useState()
@@ -16,21 +17,20 @@ const InfoCategories = () => {
     const onOpenForm = () => {
         setOpenForm(true)
     }
-    const onCloseForm = () => {
+    const onCloseForm = useCallback(() => {
         setOpenForm(false)
         setInfoCat({})
-    }
+    },[])
     const updateInfoCat = (i) => {
         setInfoCat(i)
         setOpenForm(true)
     }
 
-    const deleteInfoCat = (i) => {
-        console.log(i)
+    const deleteInfoCat = useCallback ((i) => {
         InfoCategoryService.deleteInfoCategory(i)
             .then(res => setResponseMessage(res.data))
             .catch(err => setResponseMessage(err.message))
-    }
+    }, [])
 
     useEffect(() => {
         InfoCategoryService.getAllInfoCategories()
@@ -61,7 +61,9 @@ const InfoCategories = () => {
                             <td>{i.id}</td>
                             <td>{i.title}</td>
                             <td style={{background:i.color}}></td>
-                            <td> <span onClick={() => {updateInfoCat(i)}}>Modifier</span> / <span onClick={() => {deleteInfoCat(i.id)}}>Supprimer</span> </td>
+                            <td> <ActionButtons onClick={() => {updateInfoCat(i)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
+                                /
+                                <ActionButtons onClick={() => {deleteInfoCat(i.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
                         </tr>
                     )
                 })}
@@ -75,6 +77,13 @@ const AddButton = styled.button`
   background: seagreen;
   color: white;
   padding: 1rem;
+  cursor: pointer;
+`
+const ActionButtons = styled.button`
+  border: none;
+  padding: 0.5rem;
+  border-radius: 15px;
+  background: transparent;
   cursor: pointer;
 `
 export default InfoCategories;

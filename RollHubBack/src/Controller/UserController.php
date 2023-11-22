@@ -97,11 +97,11 @@ class UserController extends AbstractController
         if(!$user){
             return $this->json(['message' => 'User not found'],Response::HTTP_NOT_FOUND);
         }
-        $validKeys = ["email", "password","pseudo", "firstname", "lastname","roles", "spots"];
+        $validKeys = ["email", "password","pseudo", "firstName", "lastName","roles", "spots"];
         foreach ($data as $key => $value){
             if ($key == "email") {
                 $userExist = $this->userRepository->findOneBy(['email' => $value]);
-                if($userExist){
+                if($userExist && ($value !== $user->getEmail())){
                     return new Response("Email aleready exist", Response::HTTP_BAD_REQUEST);
                 }
                 $user->setEmail($value ?? $user->getEmail());
@@ -116,10 +116,10 @@ class UserController extends AbstractController
                 }
                 $user->setPseudo($value ?? $user->getPseudo());
             }
-            if($key == "firstname"){
+            if($key == "firstName"){
                 $user->setFirstName($value ?? $user->getFirstName());
             }
-            if($key == 'lastname'){
+            if($key == 'lastName'){
                 $user->setLastName($value ?? $user->getLastName());
             }
             if($key == 'roles'){

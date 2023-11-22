@@ -12,7 +12,6 @@ export  const InfoForm = ({close, info, infoCategories}) => {
 
     const navigate = useNavigate();
     const onSubmit = () => {
-        values.categories = [values.categories]
         if(info.id){
             InfoService.editInfo(info.id,values)
                 .then(res => {
@@ -37,7 +36,7 @@ export  const InfoForm = ({close, info, infoCategories}) => {
         initialValues: {
             title: info.title ?? "",
             content: info.content ?? "",
-            categories: info.categories ?? ""
+            category: info.category ?? ""
         },
         validationSchema: infoSchema,
         onSubmit:onSubmit
@@ -69,11 +68,11 @@ export  const InfoForm = ({close, info, infoCategories}) => {
                     Choisissez une catégorie
                 </label>
                 <select
-                    name="categories"
-                    id="categories"
+                    name="category"
+                    id="category"
                     onChange={(e) => handleChange(e)}
                     onBlur={handleBlur}
-                    value={values.categories}
+                    value={values.category.id}
                 >
                     <option>-- Sélectionnez une catégorie --</option>
                     {infoCategories?.map((ic) => (

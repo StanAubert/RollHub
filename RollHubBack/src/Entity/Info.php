@@ -22,13 +22,9 @@ class Info
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\ManyToMany(targetEntity: InfoCategory::class, mappedBy: 'infos')]
-    private Collection $infoCategories;
-
-    public function __construct()
-    {
-        $this->infoCategories = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(inversedBy: 'infos', targetEntity: InfoCategory::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?InfoCategory $infoCategory;
 
     public function getId(): ?int
     {
@@ -59,30 +55,14 @@ class Info
         return $this;
     }
 
-    /**
-     * @return Collection<int, InfoCategory>
-     */
-    public function getInfoCategories(): Collection
+    public function getInfoCategory(): ?InfoCategory
     {
-        return $this->infoCategories;
+        return $this->infoCategory;
     }
 
-    public function addInfoCategory(InfoCategory $infoCategory): static
+    public function setInfoCategory(?InfoCategory $infoCategory): self
     {
-        if (!$this->infoCategories->contains($infoCategory)) {
-            $this->infoCategories->add($infoCategory);
-            $infoCategory->addInfo($this);
-        }
-
-        return $this;
-    }
-
-    public function removeInfoCategory(InfoCategory $infoCategory): static
-    {
-        if ($this->infoCategories->removeElement($infoCategory)) {
-            $infoCategory->removeInfo($this);
-        }
-
+        $this->infoCategory = $infoCategory;
         return $this;
     }
 }

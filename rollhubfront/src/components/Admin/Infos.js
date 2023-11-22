@@ -89,9 +89,7 @@ const Infos = () => {
                                        <td>{i.id}</td>
                                        <td>{i.title}</td>
                                        <td>{i.content}</td>
-                                       <td>{i.categories.map((ic) => {
-                                           return <p style={{color: ic.color}}>{ic.title}</p>
-                                       })}</td>
+                                       <td>{i.category?.title ?? "/"}</td>
                                        <td> <ActionButtons onClick={() => {updateInfo(i)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
                                            /
                                            <ActionButtons onClick={() => {deleteInfo(i.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>

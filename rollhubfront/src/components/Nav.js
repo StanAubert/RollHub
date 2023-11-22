@@ -7,6 +7,7 @@ import LogoutModal from "./modal/LogoutModal";
 import {tokenService} from "../services/token.service";
 import {useDispatch, useSelector} from "react-redux";
 import {clearCurrUser, setTheme} from "../redux";
+import logo from '../images/RollHubMini-transparent.svg'
 
 const Nav = () => {
     const [isOpenModal, setIsOpenModal] = useState(false)
@@ -60,21 +61,24 @@ const Nav = () => {
             }
             <header>
                 <Navbar className={mode}>
-                    <ul>
-                        <li><Link to={"/home"} >Accueil</Link></li>
-                        {
-                            isAdmin &&
+                    <Logo src={logo} alt=""/>
+                    <NavBlock>
+                        <ul>
+                            <li><Link to={"/home"} >Accueil</Link></li>
+                            {
+                                isAdmin &&
                                 <li><Link to={"/admin/users"}>Admin</Link></li>
-                        }
-                        <li> <p>{currUser.pseudo}</p> </li>
-                        <li><a onClick={onLogout}>Déconnexion</a></li>
-                    </ul>
+                            }
+                            <li> <p>{currUser.pseudo}</p> </li>
+                            <li><a onClick={onLogout}>Déconnexion</a></li>
+                        </ul>
 
-                    <ThemeButton onClick={onChangeMode}>
-                        {
-                            mode === "dark" ? <Sun color={"#e3e723"} size={"32"}/> : <Moon color={"lightblue"} size={"32"}/>
-                        }
-                    </ThemeButton>
+                        <ThemeButton onClick={onChangeMode}>
+                            {
+                                mode === "dark" ? <Sun color={"#e3e723"} size={"32"}/> : <Moon color={"lightblue"} size={"32"}/>
+                            }
+                        </ThemeButton>
+                    </NavBlock>
                 </Navbar>
 
             </header>
@@ -88,7 +92,8 @@ const Navbar = styled.nav`
   padding: 1rem;
   box-shadow: 1px 0px 10px rgba(0, 0, 0, 0.4);
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   ul{
     list-style: none;
     padding: 0;
@@ -104,11 +109,18 @@ const Navbar = styled.nav`
   }
 
 `
-
+const NavBlock = styled.nav`
+  display: flex;
+  
+`
 const ThemeButton = styled.button`
   border: none;
   background-color: transparent;
   padding: 0.8rem;
   cursor: pointer;
+`
+
+const Logo = styled.img`
+  max-width: 70px;
 `
 export default Nav

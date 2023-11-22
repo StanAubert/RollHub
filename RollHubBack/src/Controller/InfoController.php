@@ -51,7 +51,7 @@ class InfoController extends AbstractController
             return $this->json(['message' => 'Invalid JSON'], 400);
         }
         $info = new Info();
-        $validKeys = ['title', 'content', 'categories'];
+        $validKeys = ['title', 'content', 'category'];
 
         foreach ($data as $key => $value){
             if($key == "title"){
@@ -64,14 +64,12 @@ class InfoController extends AbstractController
             if($key == "content"){
                 $info->setContent($value);
             }
-            if($key == "categories"){
-                foreach ($value as $v){
-                    $infoCat = $this->infoCategoryRepository->find($v);
-                    if(!$infoCat){
-                        return new Response('Category not found', Response::HTTP_NOT_FOUND);
-                    }
-                    $info->addInfoCategory($infoCat);
+            if($key == "category"){
+                $category =  $this->infoCategoryRepository->find($value);
+                if(!$category){
+                    return new Response("Category Not Found", Response::HTTP_NOT_FOUND);
                 }
+                $info->setInfoCategory($category);
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
@@ -105,7 +103,7 @@ class InfoController extends AbstractController
             return $this->json(['message' => 'InfoCategory not found'], 404);
         }
 
-        $validKeys = ['title', 'content', 'categories'];
+        $validKeys = ['title', 'content', 'category'];
 
         foreach ($data as $key => $value){
             if($key == "title"){
@@ -118,31 +116,12 @@ class InfoController extends AbstractController
             if($key == "content"){
                 $info->setContent($value);
             }
-            if($key == "categories"){
-
-                $categoriesToRemove = [];
-                foreach ($info->getInfoCategories() as $existingCategory) {
-                    $categoryId = $existingCategory->getId();
-
-                    if (!in_array($categoryId, $value)) {
-                        $categoriesToRemove[] = $existingCategory;
-                    }
+            if($key == "category"){
+                $category =  $this->infoCategoryRepository->find($value);
+                if(!$category){
+                    return new Response("Category Not Found", Response::HTTP_NOT_FOUND);
                 }
-
-                foreach ($categoriesToRemove as $categoryToRemove) {
-                    $info->removeInfoCategory($categoryToRemove);
-                }
-
-                foreach ($value as $v){
-                    $infoCat = $this->infoCategoryRepository->find($v);
-                    if(!$infoCat){
-                        return new Response('Category not found', Response::HTTP_NOT_FOUND);
-                    }
-                    if(!$info->getInfoCategories()->contains($infoCat)){
-                        $info->addInfoCategory($infoCat);
-                        $infoCat->addInfo($info);
-                    }
-                }
+                $info->setInfoCategory($category);
             }
             if (!in_array($key, $validKeys)) {
                 return new Response("Invalid data", Response::HTTP_BAD_REQUEST);

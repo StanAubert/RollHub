@@ -12,7 +12,7 @@ class InfoSerializer
             "id" => $info->getId(),
             "title" => $info->getTitle(),
             "content" => $info->getContent(),
-            "categories" => InfoCategorySerializer::SerializeAllInfoCategoriesForInfo($info->getInfoCategories())
+            "category" => $info->getInfoCategory() ? InfoCategorySerializer::SerializeOneInfoCategoryForInfo($info->getInfoCategory()) : null,
         ];
     }
 
@@ -21,7 +21,7 @@ class InfoSerializer
         $response = [];
 
         foreach ($infos as $info){
-            array_push($response, InfoSerializer::serializeOneInfo($info));
+            $response[] = InfoSerializer::serializeOneInfo($info);
         }
 
         return $response;

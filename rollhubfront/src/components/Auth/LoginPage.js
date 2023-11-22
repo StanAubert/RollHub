@@ -30,6 +30,7 @@ const LoginPage = () => {
                 UserService.currentUser()
                     .then(res => dispatch(setCurrUser(res.data)))
                     .catch(err => {
+                        setLoading(false)
                         console.log(err)
                     })
                 setLoading(false)

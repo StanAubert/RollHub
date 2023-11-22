@@ -8,7 +8,7 @@ export const infoCategorySchema = yup.object().shape({
 export const infoSchema = yup.object().shape({
     title: yup.string().required("Champ requis"),
     content: yup.string().required("Champ requis"),
-    categories: yup.array()
+    category: yup.string()
 })
 
 export const spotSchema = yup.object().shape({

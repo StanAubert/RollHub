@@ -5,7 +5,7 @@ const login = (credentials) => {
 }
 
 const register = (data) => {
-    return Axios.post('/user/register', data)
+    return Axios.post('/users/register', data)
 }
 const saveToken = (token, id, roles) => {
     localStorage.setItem('token', token)

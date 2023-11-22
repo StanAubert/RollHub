@@ -6,6 +6,7 @@ import infos from "./Infos";
 import {InfoForm} from "../Forms/InfoForm";
 import {InfoService} from "../../services/Info.service";
 import {SpotService} from "../../services/spot.service";
+import LoaderDouble from "../LoaderDouble";
 
 const Spots = () => {
 
@@ -14,7 +15,16 @@ const Spots = () => {
     const [responseMessage, setResponseMessage] = useState()
     const [openForm, setOpenForm] = useState(false)
     const [spot, setSpot] = useState({})
+    const [isLoading, setIsLoading] = useState(true)
 
+    const loadAllSpots = () => {
+        SpotService.getAllSpots()
+            .then(res => {
+                setSpots(res.data)
+                setIsLoading(false)
+            })
+            .catch(err => {setError(err.message)} )
+    }
     const onOpenForm = () => {
         setOpenForm(true)
     }
@@ -31,49 +41,50 @@ const Spots = () => {
         SpotService.deleteSpot(i)
             .then(res => setResponseMessage(res.data))
             .catch(err => setResponseMessage(err.message))
+        loadAllSpots();
     }
 
     useEffect(() => {
-        SpotService.getAllSpots()
-            .then(res => {setSpots(res.data)})
-            .catch(err => {setError(err.message)} )
+        loadAllSpots();
     }, []);
     return (
-        <div>
+        <>
             {
-                openForm
+                isLoading ?
+                    <LoaderDouble/>
+                    :
+                    <div>
+                        {
+                            openForm
+                        }
+                        <Table>
+                            <thead>
+                            <tr>
+                                <th> # </th>
+                                <th>Nom</th>
+                                <th>Coordonnées</th>
+                                <th>Auteur</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {spots.map(s => {
+                                return (
+                                    <tr key={"row-" + s.id} >
+                                        <td>{s.id}</td>
+                                        <td>{s.name}</td>
+                                        <td>{s.latitude}, {s.longitude}</td>
+                                        <td>{s.author ?? "RollHub" }</td>
+                                        <td>
+                                            <ActionButtons onClick={() => {deleteSpot(s.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
+                                    </tr>
+                                )
+                            })}
+                            </tbody>
+                        </Table>
+                    </div>
             }
-            <h1>Infos</h1>
-            <AddButton onClick={onOpenForm}> Ajouter un spot</AddButton>
-            <h1>Spots</h1>
-
-            <Table>
-                <thead>
-                <tr>
-                    <th> # </th>
-                    <th>Nom</th>
-                    <th>Coordonnées</th>
-                    <th>Auteur</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {spots.map(s => {
-                    return (
-                        <tr key={"row-" + s.id} >
-                            <td>{s.id}</td>
-                            <td>{s.name}</td>
-                            <td>{s.latitude}, {s.longitude}</td>
-                            <td>{s.author ?? "RollHub" }</td>
-                            <td> <ActionButtons onClick={() => {updateSpot(s)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
-                                /
-                                <ActionButtons onClick={() => {deleteSpot(s.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
-                        </tr>
-                    )
-                })}
-                </tbody>
-            </Table>
-        </div>
+        </>
     );
 };
 

@@ -5,6 +5,7 @@ import styled from "styled-components";
 import {InfoCategoryForm} from "../Forms/InfoCategoryForm";
 import {useDispatch} from "react-redux";
 import {PenTool, Trash} from "react-feather";
+import LoaderDouble from "../LoaderDouble";
 
 const InfoCategories = () => {
     const [infoCategories, setInfoCategories] = useState()
@@ -12,72 +13,91 @@ const InfoCategories = () => {
     const [responseMessage, setResponseMessage] = useState()
     const [openForm, setOpenForm] = useState(false)
     const [infoCat, setInfoCat] = useState({})
+    const [isLoading, setIsLoading] = useState(true)
     const dispatch = useDispatch();
 
+    const loadAllInfoCat = () => {
+        InfoCategoryService.getAllInfoCategories()
+            .then(res => {
+                setInfoCategories(res.data)
+                setIsLoading(false)
+            })
+            .catch(err => {setError(err)})
+    }
     const onOpenForm = () => {
         setOpenForm(true)
     }
-    const onCloseForm = useCallback(() => {
+    const onCloseForm = () => {
         setOpenForm(false)
         setInfoCat({})
-    },[])
+        loadAllInfoCat();
+    }
     const updateInfoCat = (i) => {
         setInfoCat(i)
         setOpenForm(true)
     }
 
-    const deleteInfoCat = useCallback ((i) => {
+    const deleteInfoCat = (i) => {
         InfoCategoryService.deleteInfoCategory(i)
-            .then(res => setResponseMessage(res.data))
+            .then(res => {
+
+                loadAllInfoCat();
+            })
             .catch(err => setResponseMessage(err.message))
-    }, [])
+    }
 
     useEffect(() => {
-        InfoCategoryService.getAllInfoCategories()
-            .then(res => {setInfoCategories(res.data)})
-            .catch(err => {setError(err)})
-    }, [onCloseForm, deleteInfoCat]);
+        loadAllInfoCat();
+    }, []);
     return (
-        <div>
+        <>
             {
-                openForm &&
-                <InfoCategoryForm close={onCloseForm} infocat={infoCat}/>
+                isLoading ?
+                    <LoaderDouble/>
+                    :
+                    <div>
+                        {
+                            openForm &&
+                            <InfoCategoryForm close={onCloseForm} infocat={infoCat}/>
+                        }
+                        <AddButton onClick={onOpenForm}> Ajouter une catégorie</AddButton>
+                        <Table>
+                            <thead>
+                            <tr>
+                                <th> # </th>
+                                <th>Titre</th>
+                                <th>Couleur</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {infoCategories?.map(i => {
+                                return (
+                                    <tr key={"row-" + i.id}>
+                                        <td>{i.id}</td>
+                                        <td>{i.title}</td>
+                                        <td style={{background:i.color}}></td>
+                                        <td> <ActionButtons onClick={() => {updateInfoCat(i)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
+                                            /
+                                            <ActionButtons onClick={() => {deleteInfoCat(i.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
+                                    </tr>
+                                )
+                            })}
+                            </tbody>
+                        </Table>
+                    </div>
             }
-            <h1>Infos-Catégories</h1>
-            <AddButton onClick={onOpenForm}> Ajouter une catégorie</AddButton>
-            <Table>
-                <thead>
-                <tr>
-                    <th> # </th>
-                    <th>Titre</th>
-                    <th>Couleur</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {infoCategories?.map(i => {
-                    return (
-                        <tr key={"row-" + i.id}>
-                            <td>{i.id}</td>
-                            <td>{i.title}</td>
-                            <td style={{background:i.color}}></td>
-                            <td> <ActionButtons onClick={() => {updateInfoCat(i)}}><PenTool color={"cornflowerblue"}/></ActionButtons>
-                                /
-                                <ActionButtons onClick={() => {deleteInfoCat(i.id)}}><Trash color={"firebrick"}/></ActionButtons> </td>
-                        </tr>
-                    )
-                })}
-                </tbody>
-            </Table>
-        </div>
+        </>
     );
 };
 const AddButton = styled.button`
   border: none;
-  background: seagreen;
+  background-color: var(--color-green);
   color: white;
   padding: 1rem;
   cursor: pointer;
+  box-shadow: 2px 3px 6px 1px rgba(0,0,0,0.4);
+  margin-top: 1rem;
 `
 const ActionButtons = styled.button`
   border: none;

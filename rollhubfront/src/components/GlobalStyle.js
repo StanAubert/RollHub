@@ -33,7 +33,9 @@ const GlobalStyles = createGlobalStyle`
       color: #282c34;
     }
   }
-
+  :root {
+    --color-green: #04AA6D;
+  }
 
 `
 

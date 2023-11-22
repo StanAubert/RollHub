@@ -14,7 +14,7 @@ const AdminRouter = () => {
     return (
         <Routes>
             <Route element={<AdminLayout/>}>
-                <Route path="/" element={<AdminDashboard/> }/>
+                <Route path="/" element={<Users/> }/>
                 <Route path="users" element={<Users/> }/>
                 <Route path="infos" element={<Infos/> }/>
                 <Route path="spots" element={<Spots/> }/>

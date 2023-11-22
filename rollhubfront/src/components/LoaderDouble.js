@@ -1,10 +1,12 @@
 import React from 'react';
 import styled from "styled-components";
+import {Blur} from "./modal/BasicModal";
 
 const LoaderDouble = () => {
     return (
-        <Loader>
-            <p className="double">
+        <Blur>
+            <Loader>
+                <p className="double">
                             <span className="ouro">
                                 <span className="left">
                                     <span className="anim"></span>
@@ -13,12 +15,18 @@ const LoaderDouble = () => {
                                     <span className="anim"></span>
                                 </span>
                             </span>
-            </p>
-        </Loader>
+                </p>
+                <h2>Chargement ...</h2>
+            </Loader>
+        </Blur>
     );
 };
 
 const Loader = styled.div`
+  align-self: center;
+  justify-content: center;
+  margin: auto;
+  transform: scale(2);
   .ouro {
     position: relative;
     display:inline-block;

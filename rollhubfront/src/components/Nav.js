@@ -64,7 +64,7 @@ const Nav = () => {
                         <li><Link to={"/home"} >Accueil</Link></li>
                         {
                             isAdmin &&
-                                <li><Link to={"/admin"}>Admin</Link></li>
+                                <li><Link to={"/admin/users"}>Admin</Link></li>
                         }
                         <li> <p>{currUser.pseudo}</p> </li>
                         <li><a onClick={onLogout}>Déconnexion</a></li>

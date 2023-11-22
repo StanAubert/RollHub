@@ -19,11 +19,13 @@ const Register = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        console.log(data);
         tokenService.register(data)
             .then(res => {
                 navigate("/login")
             })
             .catch(err => {
+                console.log(err);
                 setError("Une erreur est survenue : " + err.response.data)
             });
     }

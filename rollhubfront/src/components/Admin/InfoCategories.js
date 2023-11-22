@@ -8,6 +8,7 @@ const InfoCategories = () => {
     const [infoCategories, setInfoCategories] = useState()
     const [error, setError] = useState();
     const [openForm, setOpenForm] = useState(false)
+    const [infoCat, setInfoCat] = useState({})
 
     useEffect(() => {
         InfoCategoryService.getAllInfoCategories()
@@ -18,15 +19,23 @@ const InfoCategories = () => {
     const onOpenForm = () => {
         setOpenForm(true)
     }
-
     const onCloseForm = () => {
         setOpenForm(false)
+        setInfoCat({})
+    }
+    const updateInfoCat = (i) => {
+        setInfoCat(i)
+        setOpenForm(true)
+    }
+
+    const deleteInfoCat = (i) => {
+        console.log("delete :" + i.title + " category")
     }
     return (
         <div>
             {
                 openForm &&
-                <InfoCategoryForm close={onCloseForm}/>
+                <InfoCategoryForm close={onCloseForm} infocat={infoCat}/>
             }
             <h1>Infos-Catégories</h1>
             <AddButton onClick={onOpenForm}> Ajouter une catégorie</AddButton>
@@ -46,7 +55,7 @@ const InfoCategories = () => {
                             <td>{i.id}</td>
                             <td>{i.title}</td>
                             <td style={{background:i.color}}></td>
-                            <td> Modifier / Supprimer </td>
+                            <td> <span onClick={() => {updateInfoCat(i)}}>Modifier</span> / <span onClick={() => {deleteInfoCat(i)}}>Supprimer</span> </td>
                         </tr>
                     )
                 })}

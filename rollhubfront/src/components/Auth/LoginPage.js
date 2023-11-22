@@ -27,7 +27,7 @@ const LoginPage = () => {
         setLoading(true)
         tokenService.login(cred)
             .then( res => {
-                tokenService.saveToken(res.data.token, res.data.data.id)
+                tokenService.saveToken(res.data.token, res.data.data.id, res.data.data.roles)
                 UserService.currentUser()
                     .then(res => dispatch(setCurrUser(res.data)))
                     .catch(err => {

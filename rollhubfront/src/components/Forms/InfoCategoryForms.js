@@ -2,32 +2,38 @@ import React from 'react';
 import {useFormik} from "formik";
 import ModalStructure from "../modal/ModalStructure";
 import styled from "styled-components";
+import {infoCategorySchema} from "./Schemas";
 
-export  const InfoCategoryForm = ({close}) => {
-    const formik = useFormik({
+export  const InfoCategoryForm = ({close, infocat}) => {
+    const {values,touched, errors, handleBlur,handleChange, handleSubmit, handleReset} = useFormik({
         initialValues: {
-            title: "",
-            color: ""
-        }
+            title: infocat.title ?? "",
+            color: infocat.color ?? ""
+        },
+        validationSchema: infoCategorySchema,
     })
     return (
         <ModalStructure close={close}>
-            <FormInfoCat>
+            <FormInfoCat onSubmit={handleSubmit}>
                 <label htmlFor="title" > Titre de la catégorie</label>
                 <input
-                    value={formik.values.title}
-                    onChange={formik.handleChange}
+                    value={values.title}
+                    onChange={handleChange}
                     type="text" id="title" placeholder="Titre"
-                    onBlur={formik.handleBlur}
+                    onBlur={handleBlur}
+                    className={errors.title && touched.title ? "input-error" : ""}
                 />
+                {errors.title && touched.title && <p className={"error-message"}>{errors.title}</p>}
                 <label htmlFor="color" id="color"> Couleur de la catégorie </label>
                 <input
-                    value={formik.values.color}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
+                    value={values.color}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
                     type="color" id="color"
+                    className={errors.color && touched.color ? "input-error" : ""}
                 />
-                <button type="submit"> Ajouter </button>
+                {errors.color && touched.color && <p className={"error-message"}>{errors.color}</p>}
+                <button type="submit" > Ajouter </button>
             </FormInfoCat>
         </ModalStructure>
     );
@@ -43,5 +49,12 @@ const FormInfoCat = styled.form`
   
   input[type="text"]{
     padding: 0.4rem;
+  }
+  
+  .input-error{
+    border:1px solid firebrick;
+  }
+  .error-message{
+    color: firebrick;   
   }
 `

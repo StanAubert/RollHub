@@ -7,9 +7,10 @@ const login = (credentials) => {
 const register = (data) => {
     return Axios.post('/user/register', data)
 }
-const saveToken = (token, id) => {
+const saveToken = (token, id, roles) => {
     localStorage.setItem('token', token)
     localStorage.setItem('currentUID', id)
+    localStorage.setItem('ROLES', roles)
 }
 
 const logout = () => {
@@ -21,11 +22,14 @@ const isLogged = () => {
     return !!token
 }
 
+const isAdmin = () => {
+    return !!localStorage.getItem('ROLES').includes("ROLE_ADMIN")
+}
 const getToken = () => {
     return localStorage.getItem('token')
 }
 
 
 export const tokenService = {
-    saveToken, logout, isLogged, getToken,login, register
+    saveToken, logout, isLogged, getToken,login, register, isAdmin
 }

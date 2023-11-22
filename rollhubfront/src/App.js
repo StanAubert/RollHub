@@ -1,6 +1,6 @@
 import './App.css';
 import LoginPage from "./components/Auth/LoginPage";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Route, Routes, useNavigate} from "react-router-dom";
 import GlobalStyle from "./components/GlobalStyle";
 import AdminRouter from "./components/Admin/AdminRouter";
 import AuthGuard from "./services/AuthGuard";
@@ -12,14 +12,6 @@ import {UserService} from "./services/user.service";
 import {setCurrUser} from "./redux";
 
 function App() {
-    const dispatch = useDispatch()
-    useEffect(() => {
-        UserService.currentUser()
-            .then(res => dispatch(setCurrUser(res.data)))
-            .catch(err => {
-                console.log(err)
-            })
-    },[])
   return (
     <div className="App">
         <GlobalStyle/>

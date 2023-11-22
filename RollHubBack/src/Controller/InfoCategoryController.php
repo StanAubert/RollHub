@@ -103,14 +103,14 @@ class InfoCategoryController extends AbstractController
         foreach ($data as $key => $value){
             if($key == 'title'){
                 $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' => $value]);
-                if($infoCategoryExists){
+                if($infoCategoryExists && ($infoCategoryExists->getTitle() !== $infoCategory->getTitle())){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $infoCategory->setTitle($value);
             }
             if($key == 'color'){
                 $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' => $value]);
-                if($infoCategoryExists){
+                if($infoCategoryExists && ($infoCategoryExists->getColor() !== $infoCategory->getColor())){
                     return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
                 }
                 $infoCategory->setColor($value);

@@ -1,4 +1,5 @@
 import {configureStore, createSlice} from "@reduxjs/toolkit";
+import {InfoCategoryService} from "../services/info.category.service";
 
 
 const usersSlice = createSlice({
@@ -34,11 +35,26 @@ const themeSlice = createSlice({
 
 })
 
+const infoCategoriesSlice= createSlice({
+    name: "InfoCategories",
+    initialState: {
+        infoCategories: {}
+    },
+    reducers: {
+        loadInfoCategories: (state, action) => {
+            state.infoCategories = InfoCategoryService.getAllInfoCategories().then(res => res.data)
+        }
+    }
+})
+
 export const { setUsers } = usersSlice.actions
 export const { setCurrUser, setTheme, clearCurrUser } = themeSlice.actions
+
+export const {loadInfoCategories} = infoCategoriesSlice.actions
 export const store = configureStore({
     reducer: {
         theme: themeSlice.reducer,
-        users: usersSlice.reducer
+        users: usersSlice.reducer,
+        infoCategories: infoCategoriesSlice.reducer
     }
 })

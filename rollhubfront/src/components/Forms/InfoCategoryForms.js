@@ -3,14 +3,41 @@ import {useFormik} from "formik";
 import ModalStructure from "../modal/ModalStructure";
 import styled from "styled-components";
 import {infoCategorySchema} from "./Schemas";
+import {InfoCategoryService} from "../../services/info.category.service";
+import {useNavigate} from "react-router-dom";
+
 
 export  const InfoCategoryForm = ({close, infocat}) => {
+
+    const navigate = useNavigate();
+    const onSubmit = () => {
+        if(infocat.id){
+            InfoCategoryService.editInfoCategory(infocat.id,values)
+                .then(res => {
+                    close()
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+        else{
+            InfoCategoryService.addInfoCategory(values)
+                .then(res => {
+                    close()
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    }
+
     const {values,touched, errors, handleBlur,handleChange, handleSubmit, handleReset} = useFormik({
         initialValues: {
             title: infocat.title ?? "",
             color: infocat.color ?? ""
         },
         validationSchema: infoCategorySchema,
+        onSubmit:onSubmit
     })
     return (
         <ModalStructure close={close}>
@@ -33,7 +60,7 @@ export  const InfoCategoryForm = ({close, infocat}) => {
                     className={errors.color && touched.color ? "input-error" : ""}
                 />
                 {errors.color && touched.color && <p className={"error-message"}>{errors.color}</p>}
-                <button type="submit" > Ajouter </button>
+                <button type="submit" onClick={handleSubmit} > Ajouter </button>
             </FormInfoCat>
         </ModalStructure>
     );

@@ -9,15 +9,15 @@ const getOneInfoCategory = (id) => {
 }
 
 const addInfoCategory = (data) => {
-    return Axios.post('/info/new', data)
+    return Axios.post('/info/category/new', data)
 }
 
 const editInfoCategory = (id, data) => {
-    return Axios.put(`/info/${id}/edit`, data)
+    return Axios.put(`/info/category/${id}/edit`, data)
 }
 
 const deleteInfoCategory = (id) => {
-    return Axios.delete(`info/$id`)
+    return Axios.delete(`info/category/${id}`)
 }
 export const InfoCategoryService = {
     getAllInfoCategories, getOneInfoCategory, addInfoCategory, editInfoCategory, deleteInfoCategory

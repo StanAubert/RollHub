@@ -5,18 +5,16 @@ import {SpotService} from "../services/spot.service";
 import LoaderDouble from "./LoaderDouble";
 import {Icon} from "leaflet/src/layer";
 import logo from "../images/RollHubMini-transparent.svg"
+import {useSelector} from "react-redux";
 
 const HomePage = () => {
     const [spots, setSpots] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState()
-    const markers = spots.map(s => {
-        return {
-            geocode: [s.latitude, s.longitude],
-            popUp: s.name
-        }
-    })
-    const [test, setTest]= useState(markers)
+    const [test, setTest]= useState([])
+    const [openToAdd, setOpenToAdd] = useState(false)
+    const [NewSpot, setNewSpot] = useState()
+    const currUser = useSelector(state => state.theme.currUser)
 
     const rollHubMarkers = new Icon({
         iconUrl: logo,
@@ -24,20 +22,30 @@ const HomePage = () => {
     })
 
     const loadAllSpots = () => {
+        let data;
         SpotService.getAllSpots()
             .then(res => {
-                setSpots(res.data)
+                data = res.data
+                setSpots(data)
                 setIsLoading(false)
+                setTest(data.map(d => {
+                    return {
+                        geocode: [d.latitude, d.longitude],
+                        popUp: d.name
+                    }
+                }))
             })
             .catch(err => {setError(err.message)} )
     }
 
     const handleMapClick = (e) => {
-        const newMarker = {
-            geocode: [e.latlng.lat, e.latlng.lng],
-        };
+        if(openToAdd){
+            const newMarker = {
+                geocode: [e.latlng.lat, e.latlng.lng],
+            };
 
-        setTest([...test, newMarker])
+            setNewSpot(newMarker)
+        }
     };
     const ClickHandler = ({ handleMapClick }) => {
         const map = useMapEvents({
@@ -47,11 +55,42 @@ const HomePage = () => {
         });
     }
 
+    const handleOpenToAdd = () => {
+        setOpenToAdd(true);
+    }
+
+    const addNewsSpot = (data) => {
+        setIsLoading(true)
+        SpotService.addSpot(data)
+            .then(res =>{
+                setIsLoading(false)
+            })
+            .catch(err => {
+                setIsLoading(false)
+            })
+    }
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setNewSpot({
+            geocode:[...NewSpot.geocode],
+        })
+        setTest([...test, NewSpot])
+        let spot = {
+            name: e.target.spotName.value,
+            latitude: NewSpot.geocode[0],
+            longitude: NewSpot.geocode[1],
+            author: currUser.id
+        }
+        addNewsSpot(spot)
+        console.log(e.target.spotName.value, NewSpot, spot, currUser)
+
+        setOpenToAdd(false)
+    }
+
 
     useEffect(() => {
         loadAllSpots()
-        console.log(test)
-    }, [test]);
+    }, [isLoading]);
 
     return (
         <>
@@ -69,7 +108,7 @@ const HomePage = () => {
                             />
                             <ClickHandler handleMapClick={handleMapClick} />
                             {
-                                markers.map(marker => {
+                                test.map(marker => {
                                     return <Marker position={marker.geocode} icon={rollHubMarkers} >
                                         <Popup>
                                             <p> {marker.popUp} </p>
@@ -77,7 +116,22 @@ const HomePage = () => {
                                     </Marker>
                                 })
                             }
+                            {
+                                NewSpot &&
+                                <Marker position={NewSpot.geocode} icon={rollHubMarkers}>
+
+                                </Marker>
+                            }
                         </MapContainer>
+
+                        <button onClick={handleOpenToAdd}> Ajouter un Spot !</button>
+                        {
+                            openToAdd &&
+                            <form onSubmit={(e) => handleSubmit(e)}>
+                                <label htmlFor="spotName">Nom du spot</label>
+                                <input name="spotName" type="text"/>
+                            </form>
+                        }
                     </Home>
             }
         </>
@@ -86,7 +140,7 @@ const HomePage = () => {
 const Home = styled.div`
   .map-rollhub{
     height: 60vh;
-    width: 75vw;
+    width: 60vw;
     margin: auto;
     box-shadow: 1px 3px 12px 3px rgba(0,0,0,0.3);
   }

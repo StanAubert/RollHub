@@ -4,38 +4,81 @@ namespace App\Controller;
 
 use App\Entity\InfoCategory;
 use App\Repository\InfoCategoryRepository;
+use App\Repository\InfoRepository;
+use App\Serializer\InfoCategorySerializer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/info/category')]
+#[Route('api/info/category')]
 class InfoCategoryController extends AbstractController
 {
+
+    public function __construct(private readonly EntityManagerInterface $entityManager, private InfoCategoryRepository $infoCategoryRepository, private InfoRepository $infoRepository)
+    {
+
+    }
+
+
+    private function makeJsonResponse($infoCategory, int $statusCode): Response
+    {
+        $response = new Response();
+        $jsonContent = is_array($infoCategory) ? InfoCategorySerializer::SerializeAllInfoCategories($infoCategory) : InfoCategorySerializer::SerializeOneInfoCategory($infoCategory);
+        $response->setContent(json_encode($jsonContent, JSON_THROW_ON_ERROR));
+        $response->headers->set("Content-Type", "application/json");
+        $response->setStatusCode($statusCode);
+        return $response;
+    }
+
+    private function persistInfoCategory(InfoCategory $infoCategory)
+    {
+        $this->entityManager->persist($infoCategory);
+        $this->entityManager->flush();
+    }
     #[Route('/', name: 'app_info_category_index', methods: ['GET'])]
     public function index(InfoCategoryRepository $infoCategoryRepository): Response
     {
         $allInfoCategories = $infoCategoryRepository->findAll();
-        return $this->json($allInfoCategories,Response::HTTP_OK);
+        return $this->makeJsonResponse($allInfoCategories,Response::HTTP_OK);
     }
 
     #[Route('/new', name: 'app_info_category_new', methods: ['POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
     
         if ($data === null) {
             return $this->json(['message' => 'Invalid JSON'], 400);
         }
-    
         $infoCategory = new InfoCategory();
-        $infoCategory->setTitle($data['title']);
-        $infoCategory->setColor($data['color']);
-        $entityManager->persist($infoCategory);
-        $entityManager->flush();
+        $validKeys = ['title', 'color'];
+
+        foreach ($data as $key => $value){
+            if($key == 'title'){
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' => $value]);
+                if($infoCategoryExists){
+                    return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $infoCategory->setTitle($value);
+            }
+            if($key == 'color'){
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' => $value]);
+                if($infoCategoryExists){
+                    return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $infoCategory->setColor($value);
+            }
+
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $this->persistInfoCategory($infoCategory);
     
-        return $this->json($infoCategory, 201);
+        return $this->makeJsonResponse($infoCategory, Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'app_info_category_show', methods: ['GET'])]
@@ -47,7 +90,7 @@ class InfoCategoryController extends AbstractController
             return $this->json(['message' => 'InfoCategory not found'], 404);
         }
 
-        return $this->json($infoCategory);
+        return $this->makeJsonResponse($infoCategory, Response::HTTP_OK);
     }
 
     #[Route('/{id}/edit', name: 'app_info_category_edit', methods: ['PUT', 'PATCH'])]
@@ -55,17 +98,30 @@ class InfoCategoryController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $infoCategory = $infoCategoryRepository->find($id);
+        $validKeys = ['title', 'color'];
 
-        if (!$infoCategory) {
-            return $this->json(['message' => 'InfoCategory not found'], 404);
+        foreach ($data as $key => $value){
+            if($key == 'title'){
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['title' => $value]);
+                if($infoCategoryExists && ($infoCategoryExists->getTitle() !== $infoCategory->getTitle())){
+                    return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $infoCategory->setTitle($value);
+            }
+            if($key == 'color'){
+                $infoCategoryExists = $this->infoCategoryRepository->findOneBy(['color' => $value]);
+                if($infoCategoryExists && ($infoCategoryExists->getColor() !== $infoCategory->getColor())){
+                    return new Response("Category already exists", Response::HTTP_BAD_REQUEST);
+                }
+                $infoCategory->setColor($value);
+            }
+
+            if (!in_array($key, $validKeys)) {
+                return new Response("Invalid data", Response::HTTP_BAD_REQUEST);
+            }
         }
-
-        $infoCategory->setTitle($data['title'] ?? $infoCategory->getTitle());
-        $infoCategory->setColor($data['color'] ?? $infoCategory->getColor());
-
-        $entityManager->flush();
-
-        return $this->json($infoCategory);
+        $this->persistInfoCategory($infoCategory);
+        return $this->makeJsonResponse($infoCategory, Response::HTTP_OK);
     }
 
     #[Route('/{id}', name: 'app_info_category_delete', methods: ['DELETE'])]
@@ -80,7 +136,7 @@ class InfoCategoryController extends AbstractController
         $entityManager->remove($infoCategory);
         $entityManager->flush();
 
-        return $this->json(['message' => 'InfoCategory deleted']);
+        return $this->json(['message' => 'InfoCategory deleted'], Response::HTTP_OK);
     }
     
 }

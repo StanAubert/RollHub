@@ -21,7 +21,7 @@ class InfoCategory
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $color = null;
 
-    #[ORM\ManyToMany(targetEntity: Info::class, inversedBy: 'infoCategories')]
+    #[ORM\OneToMany(mappedBy: 'infoCategory', targetEntity: Info::class)]
     private Collection $infos;
 
     public function __construct()

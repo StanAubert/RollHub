@@ -8,55 +8,19 @@ import {UserService} from "../../services/user.service";
 import {useDispatch} from "react-redux";
 import {setCurrUser} from "../../redux";
 import LoaderDouble from "../LoaderDouble";
+import {LoginForm} from "../Forms/LoginForm";
 
 
 const LoginPage = () => {
-    const [cred, setCred] = useState({
-        username: "",
-        password: ""
-    })
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
-    const loginUrl= login();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
 
-    const onSubmit = (e) => {
-        e.preventDefault();
-        setLoading(true)
-        tokenService.login(cred)
-            .then( res => {
-                tokenService.saveToken(res.data.token, res.data.data.id, res.data.data.roles)
-                UserService.currentUser()
-                    .then(res => dispatch(setCurrUser(res.data)))
-                    .catch(err => {
-                        setLoading(false)
-                        console.log(err)
-                    })
-                setLoading(false)
-                navigate("/")
-            } )
-            .catch(err => {
-                setError("Identifiants inconnus")
-            })
-    }
-
-    const onChange = (e) => {
-        setCred({
-            ...cred,
-            [e.target.name] : e.target.value
-        })
-    }
     return (
         <>
             <h1>RollHub</h1>
             <div>
                 <h3>Login</h3>
-                <Form onSubmit={onSubmit}>
-                    <input type="email" placeholder={"Email"} name="username" value={cred.username} onChange={onChange}/>
-                    <input type="password" placeholder={"Mot de passe"} name="password" value={cred.password} onChange={onChange}/>
-                    <button> Connexion </button>
-                </Form>
+                <LoginForm setLoading={setLoading} setError={setError}/>
                 <p>Pas encore membre ? <Link to={"/register"}>Créer un compte</Link></p>
                 {
                     loading &&

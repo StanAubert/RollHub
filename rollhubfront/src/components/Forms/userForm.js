@@ -11,7 +11,6 @@ export const UserForm = ({close, user}) => {
 
     const navigate = useNavigate();
     const onSubmit = () => {
-        console.log(values)
         UserService.editUser(user.id,values)
             .then(res => {
                 close()

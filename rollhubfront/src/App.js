@@ -6,6 +6,7 @@ import AdminRouter from "./components/Admin/AdminRouter";
 import AuthGuard from "./services/AuthGuard";
 import BaseRouter from "./components/Base/BaseRouter";
 import Register from "./components/Auth/Register";
+import {RegisterForm} from "./components/Forms/RegisterForm";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                 }/>
                 <Route path={"/login"} element={ <LoginPage/>}/>
                 <Route path={"/register"} element={ <Register/>}/>
+                <Route path={"/register2"} element={ <RegisterForm/>}/>
 
             </Routes>
         </BrowserRouter>

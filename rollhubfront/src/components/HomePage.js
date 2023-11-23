@@ -82,7 +82,6 @@ const HomePage = () => {
             author: currUser.id
         }
         addNewsSpot(spot)
-        console.log(e.target.spotName.value, NewSpot, spot, currUser)
 
         setOpenToAdd(false)
     }
@@ -101,7 +100,7 @@ const HomePage = () => {
                     <Home>
                         <h2>Bienvenue sur Rollhub</h2>
                         <p>Retrouver ici les meilleurs spots pour rouler !</p>
-                        <MapContainer center={[45.757628,4.832225]} zoom={13} className="map-rollhub">
+                        <MapContainer center={[45.757628,4.832225]} zoom={11} className="map-rollhub">
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'

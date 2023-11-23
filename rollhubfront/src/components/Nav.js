@@ -45,7 +45,6 @@ const Nav = () => {
 
     const openModal = () => {
         setIsOpenModal(true)
-        console.log(isOpenModal)
     }
     const logoutURL= logout()
     const navigate = useNavigate();

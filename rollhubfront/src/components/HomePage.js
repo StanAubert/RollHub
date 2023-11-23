@@ -69,6 +69,15 @@ const HomePage = () => {
                 setIsLoading(false)
             })
     }
+    function secureInput(input) {
+        return input
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
         setNewSpot({
@@ -76,7 +85,7 @@ const HomePage = () => {
         })
         setTest([...test, NewSpot])
         let spot = {
-            name: e.target.spotName.value,
+            name: secureInput(e.target.spotName.value),
             latitude: NewSpot.geocode[0],
             longitude: NewSpot.geocode[1],
             author: currUser.id
@@ -100,37 +109,40 @@ const HomePage = () => {
                     <Home>
                         <h2>Bienvenue sur Rollhub</h2>
                         <p>Retrouver ici les meilleurs spots pour rouler !</p>
-                        <MapContainer center={[45.757628,4.832225]} zoom={11} className="map-rollhub">
-                            <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-                            />
-                            <ClickHandler handleMapClick={handleMapClick} />
-                            {
-                                test.map(marker => {
-                                    return <Marker position={marker.geocode} icon={rollHubMarkers} >
-                                        <Popup>
-                                            <p> {marker.popUp} </p>
-                                        </Popup>
-                                    </Marker>
-                                })
-                            }
-                            {
-                                NewSpot &&
-                                <Marker position={NewSpot.geocode} icon={rollHubMarkers}>
-
-                                </Marker>
-                            }
-                        </MapContainer>
-
-                        <button onClick={handleOpenToAdd}> Ajouter un Spot !</button>
+                        <AddSpotButton onClick={() => {setOpenToAdd(!openToAdd)}}> Ajouter un Spot !</AddSpotButton>
                         {
                             openToAdd &&
-                            <form onSubmit={(e) => handleSubmit(e)}>
-                                <label htmlFor="spotName">Nom du spot</label>
-                                <input name="spotName" type="text"/>
-                            </form>
+                            <AddSpotFormContainer>
+                                <form onSubmit={(e) => handleSubmit(e)}>
+                                    <label htmlFor="spotName">Nom du spot</label>
+                                    <input name="spotName" type="text" placeholder="Nom du spot"/>
+                                </form>
+                            </AddSpotFormContainer>
                         }
+                        <Container>
+                            <MapContainer center={[45.757628,4.832225]} zoom={11} className="map-rollhub">
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                                />
+                                <ClickHandler handleMapClick={handleMapClick} />
+                                {
+                                    test.map(marker => {
+                                        return <Marker position={marker.geocode} icon={rollHubMarkers} >
+                                            <Popup>
+                                                <p> {marker.popUp} </p>
+                                            </Popup>
+                                        </Marker>
+                                    })
+                                }
+                                {
+                                    NewSpot &&
+                                    <Marker position={NewSpot.geocode} icon={rollHubMarkers}>
+
+                                    </Marker>
+                                }
+                            </MapContainer>
+                        </Container>
                     </Home>
             }
         </>
@@ -143,5 +155,35 @@ const Home = styled.div`
     margin: auto;
     box-shadow: 1px 3px 12px 3px rgba(0,0,0,0.3);
   }
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+`
+
+const AddSpotButton =  styled.button`
+  max-width: 10rem;
+  align-self: center;
+  border: none;
+  padding: 1rem;
+  background-color: #282c34;
+  color: white;
+`
+
+const AddSpotFormContainer = styled.article`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  form{
+    display: flex;
+    flex-direction: column;
+  }
+  input{
+    padding: 0.4rem;
+  }
+`
+
+const Container = styled.section`
+    padding: 2rem;
 `
 export default HomePage

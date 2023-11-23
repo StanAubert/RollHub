@@ -159,7 +159,8 @@ const NavBlock = styled.nav`
   }};
 
   @media screen and (min-width: 700px){
-  display: flex;
+    display: flex;
+    justify-content: flex-end;
 }
 `
 

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Table} from "./Users";
 import {InfoService} from "../../services/Info.service";
 import {InfoForm} from "../Forms/InfoForm";
 import styled from "styled-components";
 import {PenTool, Trash} from "react-feather";
 import {InfoCategoryService} from "../../services/info.category.service";
 import LoaderDouble from "../LoaderDouble";
+import Table from "./Table";
 
 const Infos = () => {
     const [infos, setInfos] = useState([])
@@ -110,7 +110,7 @@ const AddButton = styled.button`
   padding: 1rem;
   cursor: pointer;
   box-shadow: 2px 3px 6px 1px rgba(0,0,0,0.4);
-  margin-top: 1rem;
+  margin: 1rem 0;
 `
 const ActionButtons = styled.button`
   border: none;

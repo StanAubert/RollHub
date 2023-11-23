@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {PenTool, Trash} from "react-feather";
-import {Table} from "./Users";
 import styled from "styled-components";
 import infos from "./Infos";
 import {InfoForm} from "../Forms/InfoForm";
 import {InfoService} from "../../services/Info.service";
 import {SpotService} from "../../services/spot.service";
 import LoaderDouble from "../LoaderDouble";
+import Table from "./Table";
 
 const Spots = () => {
 

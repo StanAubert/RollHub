@@ -37,6 +37,23 @@ const GlobalStyles = createGlobalStyle`
     --color-green: #04AA6D;
   }
 
+  #custom-scroll::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: transparent;
+  }
+
+  #custom-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: transparent;
+  }
+
+  #custom-scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: var(--color-green);
+  }
+
 `
 
 export default GlobalStyles

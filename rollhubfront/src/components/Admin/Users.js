@@ -5,6 +5,7 @@ import {Loader, PenTool, Trash} from "react-feather";
 import {InfoService} from "../../services/Info.service";
 import {UserForm} from "../Forms/userForm";
 import LoaderDouble from "../LoaderDouble";
+import Table from "./Table";
 
 const Users = () => {
     const [users, setUsers] = useState([])
@@ -96,7 +97,7 @@ const Users = () => {
         </>
     );
 };
-export const Table = styled.table`
+export const TableX = styled.table`
   font-family: Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 95%;

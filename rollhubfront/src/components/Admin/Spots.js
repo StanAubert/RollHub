@@ -39,7 +39,10 @@ const Spots = () => {
 
     const deleteSpot = (i) => {
         SpotService.deleteSpot(i)
-            .then(res => setResponseMessage(res.data))
+            .then(res => {
+                setResponseMessage(res.data)
+                loadAllSpots();
+            })
             .catch(err => setResponseMessage(err.message))
         loadAllSpots();
     }
